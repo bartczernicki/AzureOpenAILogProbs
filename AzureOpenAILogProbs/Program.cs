@@ -46,9 +46,6 @@ namespace AzureOpenAILogProbs
 
                 var modelDeploymentName = azureModelDeploymentName;
 
-                // From this Wikipedia article from the OpenAI Cookbook
-                // https://cookbook.openai.com/examples/using_logprobs
-
                 // https://en.wikipedia.org/wiki/New_York_Mets 
                 var sampleWikipediaArticle = """
                 The New York Mets are an American professional baseball team based in the New York City borough of Queens.
@@ -76,7 +73,7 @@ namespace AzureOpenAILogProbs
                     Console.WriteLine("Select one of the options to run, by typing either 1 through 3:");
                     Console.WriteLine("1) First Token Probability - True or False, whether the model has enough info to answer question.");
                     Console.WriteLine("2) Weighted Probability of Confidence Score - Self Confidence Score that is weighted from LogProbs PMF distribution.");
-                    Console.WriteLine("3) Confidence Interval - Calculated from bootstrap of multiple calls to the model.");
+                    Console.WriteLine("3) Confidence Interval - Calculated from bootstrap simulation of multiple calls to the model.");
 
                     var insertedText = Console.ReadLine();
                     string trimmedInput = insertedText!.Trim();
@@ -170,6 +167,9 @@ namespace AzureOpenAILogProbs
                 }
                 else if (selectedProcessingChoice == ProcessingOptions.WeightedProbability)
                 {
+                    // From this Wikipedia article from the OpenAI Cookbook
+                    // https://cookbook.openai.com/examples/using_logprobs
+
                     foreach (var question in questions)
                     {
                         var promptInstructionsConfidenceScore = $"""
