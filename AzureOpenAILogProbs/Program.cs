@@ -309,10 +309,10 @@ namespace AzureOpenAILogProbs
                     // Sample with replacement from the weightedConfidenceScores
                     var random = new Random(100);
                     var bootstrapConfidenceScores = new List<double>();
-                    for (int i = 0; i != 1000; i++)
+                    for (int i = 0; i != 1000; i++) // 1,000 Bootstrap Simulations (bootstrap estimates)
                     {
                         var bootstrapSample = new List<double>();
-                        for (int j = 0; j != 100; j++)
+                        for (int j = 0; j != 30; j++) // Keep the sample size at least 30, could be higher to reduce variance/error
                         {
                             var randomIndex = random.Next(0, weightedConfidenceScores.Count);
                             bootstrapSample.Add(weightedConfidenceScores[randomIndex]);
