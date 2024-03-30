@@ -64,14 +64,21 @@ namespace AzureOpenAILogProbs
 
                 foreach (var question in questions)
                 {
-                    var promptInstructions = $"""
+                    var promptInstructionsTrueFalse = $"""
                     You retrieved this Wikipedia Article: {wikipediaArticle}. The question is: {question}.
                     Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
-                    Your output should JUST be the boolean true or false, of if you have sufficient information in the Wikipedia article to answer the question.
+                    Your output should JUST be the boolean true or false, if you have sufficient information in the Wikipedia article to answer the question.
                     Respond with just one word, the boolean true or false. You must output the word 'True', or the word 'False', nothing else.
                     """;
 
-                    var chatCompletionsOptions = new ChatCompletionsOptions()
+                    var promptInstructionsConfidenceScore = $"""
+                    You retrieved this Wikipedia Article: {wikipediaArticle}. The question is: {question}.
+                    Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
+                    Your output should JUST be the a single confidence score between 1 to 10, if you have sufficient information in the Wikipedia article to answer the question.
+                    Respond with just one confidence score number between 1 to 10. You must output a single number, nothing else.
+                    """;
+
+                    var chatCompletionsOptionsTrueFalse = new ChatCompletionsOptions()
                     {
                         DeploymentName = modelDeploymentName, // Use DeploymentName for "model" with non-Azure clients
                         Messages =
@@ -79,17 +86,34 @@ namespace AzureOpenAILogProbs
                             // The system message represents instructions or other guidance about how the assistant should behave
                             new ChatRequestSystemMessage("You are a helpful assistant. You will follow the instructions provided in the prompt."),
                             // User messages represent current or historical input from the end user
-                            new ChatRequestUserMessage(promptInstructions)
+                            new ChatRequestUserMessage(promptInstructionsTrueFalse)
                         }
                     };
 
-                    chatCompletionsOptions.Temperature = 0.0f;
-                    chatCompletionsOptions.EnableLogProbabilities = true;
+                    var chatCompletionOptionsConfidenceScore = new ChatCompletionsOptions()
+                    {
+                        DeploymentName = modelDeploymentName, // Use DeploymentName for "model" with non-Azure clients
+                        Messages =
+                        {
+                            // The system message represents instructions or other guidance about how the assistant should behave
+                            new ChatRequestSystemMessage("You are a helpful assistant. You will follow the instructions provided in the prompt."),
+                            // User messages represent current or historical input from the end user
+                            new ChatRequestUserMessage(promptInstructionsConfidenceScore)
+                        }
+                    };
 
-                    // chatCompletionsOptions.LogProbabilitiesPerToken = 2;
-                    Response<ChatCompletions> response = await client.GetChatCompletionsAsync(chatCompletionsOptions);
 
-                    ChatResponseMessage responseMessage = response.Value.Choices[0].Message;
+                    chatCompletionsOptionsTrueFalse.Temperature = 0.0f;
+                    chatCompletionsOptionsTrueFalse.EnableLogProbabilities = true;
+                    chatCompletionOptionsConfidenceScore.Temperature = 0.0f;
+                    chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
+                    chatCompletionOptionsConfidenceScore.LogProbabilitiesPerToken = 5;
+
+                    Response<ChatCompletions> responseTrueFalse = await client.GetChatCompletionsAsync(chatCompletionsOptionsTrueFalse);
+                    Response<ChatCompletions> responseConfidenceScore = await client.GetChatCompletionsAsync(chatCompletionOptionsConfidenceScore);
+
+                    ChatResponseMessage responseMessageTrueFalse = responseTrueFalse.Value.Choices[0].Message;
+                    ChatResponseMessage responseMessageConfidenceScore = responseTrueFalse.Value.Choices[0].Message;
                     Console.ForegroundColor = ConsoleColor.Yellow;
 
                     Console.WriteLine();
@@ -97,17 +121,24 @@ namespace AzureOpenAILogProbs
                     Console.ResetColor();
 
                     // https://stackoverflow.com/questions/48465737/how-to-convert-log-probability-into-simple-probability-between-0-and-1-values-us
-                    var logProbs = response.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability: " + Math.Round(Math.Exp(a.LogProbability), 10));
+                    var logProbsTrueFalse = responseTrueFalse.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability: " + Math.Round(Math.Exp(a.LogProbability), 10));
+                    var logProbsConfidenceScore = responseConfidenceScore.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability: " + Math.Round(Math.Exp(a.LogProbability), 10));
 
                     // write logProbs to console
-                    foreach (var logProb in logProbs)
+                    foreach (var logProb in logProbsTrueFalse)
                     {
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine("Answer: " + logProb);
+                        Console.WriteLine("True/False Answer: " + logProb);
                         Console.ResetColor();
                     }
 
-                    Console.WriteLine($"[{responseMessage.Role.ToString().ToUpperInvariant()}]: {responseMessage.Content}");
+                    var topLogProbabilityEntriesConfidenceScore = responseConfidenceScore!.Value.Choices[0].LogProbabilityInfo!.TokenLogProbabilityResults!.FirstOrDefault()!.TopLogProbabilityEntries;
+
+                    var confidenceScoreSum = topLogProbabilityEntriesConfidenceScore.Select(a => int.TryParse(a.Token, out _) ? int.Parse(a.Token) * Math.Exp(a.LogProbability) : 0).Sum();
+                    Console.WriteLine(confidenceScoreSum);
+
+                    Console.WriteLine($"[{responseMessageTrueFalse.Role.ToString().ToUpperInvariant()}]: {responseMessageTrueFalse.Content}");
+                    Console.WriteLine($"[{responseMessageConfidenceScore.Role.ToString().ToUpperInvariant()}]: {responseMessageConfidenceScore.Content}");
                 }
             }
         }
