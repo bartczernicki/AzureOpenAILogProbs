@@ -59,7 +59,10 @@ namespace AzureOpenAILogProbs
                 "Where the Mets were a bad team in the 1960s", // expected: true
                 "Are the Mets uniform colors only blue and orange?", // expected: ?
                 "Are the there only 2 Mets uniform colors?", // expected: ?
-                "Do you think the Mets were a historically good team?" // expected: ?
+                "Do you think the Mets were a historically good team?", // expected: ?
+                "Did the Mets have a winning season in their first year of play?", // expected: ?
+                "Has Steve Cohen been the longest-serving owner of the Mets?", // expected: ?
+                "Is Citi Field located on the exact original site of Shea Stadium?" // expected: ?
                 };
 
                 foreach (var question in questions)
