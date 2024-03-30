@@ -49,6 +49,7 @@ namespace AzureOpenAILogProbs
                 // From this Wikipedia article from the OpenAI Cookbook
                 // https://cookbook.openai.com/examples/using_logprobs
 
+                // https://en.wikipedia.org/wiki/New_York_Mets 
                 var sampleWikipediaArticle = """
                 The New York Mets are an American professional baseball team based in the New York City borough of Queens.
                 The Mets compete in Major League Baseball (MLB) as a member of the National League (NL) East Division.
@@ -65,6 +66,7 @@ namespace AzureOpenAILogProbs
                 As of the end of the 2023 regular season, the team's overall win–loss record is 4,727–5,075–8 (.482).
                 """;
 
+                // Processing Options
                 ProcessingOptions selectedProcessingChoice = (ProcessingOptions) 0;
                 bool validInput = false;
                 while (!validInput)
@@ -73,7 +75,7 @@ namespace AzureOpenAILogProbs
                     Console.WriteLine(string.Empty);
                     Console.WriteLine("Select one of the options to run, by typing either 1 through 3:");
                     Console.WriteLine("1) First Token Probability - True or False, whether the model has enough info to answer question.");
-                    Console.WriteLine("2) Weighted Probability - Self Confidence Score that is weighted from LogProbs PMF distribution.");
+                    Console.WriteLine("2) Weighted Probability of Confidence Score - Self Confidence Score that is weighted from LogProbs PMF distribution.");
                     Console.WriteLine("3) Confidence Interval - Calculated from bootstrap of multiple calls to the model.");
 
                     var insertedText = Console.ReadLine();
@@ -90,15 +92,14 @@ namespace AzureOpenAILogProbs
                         Console.WriteLine("Incorrect selection!!!!");
                     }
                 }
+                Console.WriteLine(string.Empty);
                 Console.WriteLine("You selected: {0}", selectedProcessingChoice);
 
-
-
+                Console.ForegroundColor= ConsoleColor.Magenta;
+                Console.WriteLine("Using the following Wikipedia Article as grounding information for questions...");
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine(sampleWikipediaArticle);
                 Console.WriteLine(string.Empty);
-
-                Console.WriteLine("Process Questions...");
 
                 // List of questions to ask the model
                 var questions = new List<string>
@@ -117,104 +118,121 @@ namespace AzureOpenAILogProbs
                 "Is Citi Field located on the exact original site of Shea Stadium?" // expected: ?
                 };
 
-                foreach (var question in questions)
+
+                if (selectedProcessingChoice == (ProcessingOptions.FirstTokenProbability))
                 {
-                    var promptInstructionsTrueFalse = $"""
-                    You retrieved this Wikipedia Article: {sampleWikipediaArticle}. The question is: {question}.
-                    Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
-                    Your output should JUST be the boolean true or false, if you have sufficient information in the Wikipedia article to answer the question.
-                    Respond with just one word, the boolean true or false. You must output the word 'True', or the word 'False', nothing else.
-                    """;
-
-                    var promptInstructionsConfidenceScore = $"""
-                    You retrieved this Wikipedia Article: {sampleWikipediaArticle}. The question is: {question}.
-                    Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
-                    Your output should JUST be the a single confidence score between 1 to 10, if you have sufficient information in the Wikipedia article to answer the question.
-                    Respond with just one confidence score number between 1 to 10. You must output a single number, nothing else.
-                    """;
-
-                    var chatCompletionsOptionsTrueFalse = new ChatCompletionsOptions()
+                    foreach (var question in questions)
                     {
-                        DeploymentName = modelDeploymentName, // Use DeploymentName for "model" with Azure clients
-                        Messages =
+                        var promptInstructionsTrueFalse = $"""
+                        You retrieved this Wikipedia Article: {sampleWikipediaArticle}. The question is: {question}.
+                        Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
+                        Your output should JUST be the boolean true or false, if you have sufficient information in the Wikipedia article to answer the question.
+                        Respond with just one word, the boolean true or false. You must output the word 'True', or the word 'False', nothing else.
+                        """;
+
+                        var chatCompletionsOptionsTrueFalse = new ChatCompletionsOptions()
                         {
-                            // The system message represents instructions or other guidance about how the assistant should behave
-                            new ChatRequestSystemMessage("You are an assistant testing large language model features. Follow the instructions provided in the prompt."),
-                            // User messages represent current or historical input from the end user
-                            new ChatRequestUserMessage(promptInstructionsTrueFalse)
-                        }
-                    };
+                            DeploymentName = modelDeploymentName, // Use DeploymentName for "model" with Azure clients
+                            Messages =
+                            {
+                                // The system message represents instructions or other guidance about how the assistant should behave
+                                new ChatRequestSystemMessage("You are an assistant testing large language model features. Follow the instructions provided in the prompt."),
+                                // User messages represent current or historical input from the end user
+                                new ChatRequestUserMessage(promptInstructionsTrueFalse)
+                            }
+                        };
 
-                    var chatCompletionOptionsConfidenceScore = new ChatCompletionsOptions()
-                    {
-                        DeploymentName = modelDeploymentName, // Use DeploymentName for "model" with Azure clients
-                        Messages =
+                        chatCompletionsOptionsTrueFalse.Temperature = 0.0f;
+                        chatCompletionsOptionsTrueFalse.EnableLogProbabilities = true;
+
+                        Response<ChatCompletions> responseTrueFalse = await client.GetChatCompletionsAsync(chatCompletionsOptionsTrueFalse);
+                        ChatResponseMessage responseMessageTrueFalse = responseTrueFalse.Value.Choices[0].Message;
+
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+
+                        // 1) Write the Question to the console
+                        Console.WriteLine();
+                        Console.WriteLine(question);
+                        Console.ResetColor();
+
+                        // 2) True/False Question - Raw answers to the console
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine($"[{responseMessageTrueFalse.Role.ToString().ToUpperInvariant()} - True/False]: {responseMessageTrueFalse.Content}");
+
+                        // 3) True/False Question - Answer Details
+                        // https://stackoverflow.com/questions/48465737/how-to-convert-log-probability-into-simple-probability-between-0-and-1-values-us
+                        var logProbsTrueFalse = responseTrueFalse.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability of First Token: " + Math.Round(Math.Exp(a.LogProbability), 10));
+                        // Write out the first token probability
+                        foreach (var logProb in logProbsTrueFalse)
                         {
-                            // The system message represents instructions or other guidance about how the assistant should behave
-                            new ChatRequestSystemMessage("You are an assistant testing large language model features. Follow the instructions provided in the prompt."),
-                            // User messages represent current or historical input from the end user
-                            new ChatRequestUserMessage(promptInstructionsConfidenceScore)
+                            Console.WriteLine($"True/False Answer: {logProb}");
                         }
-                    };
-
-
-                    chatCompletionsOptionsTrueFalse.Temperature = 0.0f;
-                    chatCompletionsOptionsTrueFalse.EnableLogProbabilities = true;
-                    chatCompletionOptionsConfidenceScore.Temperature = 0.0f;
-                    chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
-                    // For the Confidence Score, we want to see 5 of the top log probabilities (PMF)
-                    chatCompletionOptionsConfidenceScore.LogProbabilitiesPerToken = 5;
-
-                    Response<ChatCompletions> responseTrueFalse = await client.GetChatCompletionsAsync(chatCompletionsOptionsTrueFalse);
-                    Response<ChatCompletions> responseConfidenceScore = await client.GetChatCompletionsAsync(chatCompletionOptionsConfidenceScore);
-
-                    ChatResponseMessage responseMessageTrueFalse = responseTrueFalse.Value.Choices[0].Message;
-                    ChatResponseMessage responseMessageConfidenceScore = responseConfidenceScore.Value.Choices[0].Message;
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-
-                    // 1) Write the Question to the console
-                    Console.WriteLine();
-                    Console.WriteLine(question);
-                    Console.ResetColor();
-
-                    // 2) True/False Question - Raw answers to the console
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine($"[{responseMessageTrueFalse.Role.ToString().ToUpperInvariant()} -       True/False]: {responseMessageTrueFalse.Content}");
-
-                    // 3) True/False Question - Answer Details
-                    // https://stackoverflow.com/questions/48465737/how-to-convert-log-probability-into-simple-probability-between-0-and-1-values-us
-                    var logProbsTrueFalse = responseTrueFalse.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability of First Token: " + Math.Round(Math.Exp(a.LogProbability), 10));
-                    // Write out the first token probability
-                    foreach (var logProb in logProbsTrueFalse)
+                    } // end of foreach question loop
+                }
+                else if (selectedProcessingChoice == ProcessingOptions.WeightedProbability)
+                {
+                    foreach (var question in questions)
                     {
-                        Console.WriteLine($"True/False Answer: {logProb}");
+                        var promptInstructionsConfidenceScore = $"""
+                        You retrieved this Wikipedia Article: {sampleWikipediaArticle}. The question is: {question}.
+                        Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
+                        Your output should JUST be the a single confidence score between 1 to 10, if you have sufficient information in the Wikipedia article to answer the question.
+                        Respond with just one confidence score number between 1 to 10. You must output a single number, nothing else.
+                        """;
+
+                        var chatCompletionOptionsConfidenceScore = new ChatCompletionsOptions()
+                        {
+                            DeploymentName = modelDeploymentName, // Use DeploymentName for "model" with Azure clients
+                            Messages =
+                            {
+                                // The system message represents instructions or other guidance about how the assistant should behave
+                                new ChatRequestSystemMessage("You are an assistant testing large language model features. Follow the instructions provided in the prompt."),
+                                // User messages represent current or historical input from the end user
+                                new ChatRequestUserMessage(promptInstructionsConfidenceScore)
+                            }
+                        };
+
+                        chatCompletionOptionsConfidenceScore.Temperature = 0.0f;
+                        chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
+                        // For the Confidence Score, we want to see 5 of the top log probabilities (PMF)
+                        chatCompletionOptionsConfidenceScore.LogProbabilitiesPerToken = 5;
+
+                        
+                        Response<ChatCompletions> responseConfidenceScore = await client.GetChatCompletionsAsync(chatCompletionOptionsConfidenceScore);
+                        ChatResponseMessage responseMessageConfidenceScore = responseConfidenceScore.Value.Choices[0].Message;
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+
+                        // 1) Write the Question to the console
+                        Console.WriteLine();
+                        Console.WriteLine(question);
+                        Console.ResetColor();
+
+                        // 2) Confidence Score Question - Raw answers to the console
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine($"[{responseMessageConfidenceScore.Role.ToString().ToUpperInvariant()} - Confidence Score]: {responseMessageConfidenceScore.Content}");
+
+                        // 3) Confidence Score Question - Process the Confidence Score answer details
+                        var logProbsConfidenceScore = responseConfidenceScore.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability of First Token: " + Math.Round(Math.Exp(a.LogProbability), 10));
+                        // Write out the first token probability
+                        foreach (var logProb in logProbsConfidenceScore)
+                        {
+                            Console.WriteLine($"Weighted Probability Calculation Details: {logProb}");
+                        }
+
+                        // 4) Retrieve the Top 5 Log Probability Entries for the Confidence Score
+                        var topLogProbabilityEntriesConfidenceScore = responseConfidenceScore!.Value.Choices[0].LogProbabilityInfo!.TokenLogProbabilityResults!.FirstOrDefault()!.TopLogProbabilityEntries;
+
+                        // 5) Calculate the PMF (Probability Mass Function) for the Confidence Score, for only the valid integer tokens
+                        var confidenceScoreProbabilityMassFunctionSum = topLogProbabilityEntriesConfidenceScore.Select(a => int.TryParse(a.Token, out _) ? Math.Exp(a.LogProbability) : 0).Sum();
+                        var pmfScaleFactor = 1 / confidenceScoreProbabilityMassFunctionSum;
+
+                        // 6) Calculate the Weighted (Sum of all the Score*Probability) Confidence Score
+                        var confidenceScoreSum = topLogProbabilityEntriesConfidenceScore.Select(a => int.TryParse(a.Token, out _) ? int.Parse(a.Token) * Math.Exp(a.LogProbability) * pmfScaleFactor : 0).Sum();
+
+                        Console.WriteLine($"Weighted Probability Calculation Details: Valid Tokens Probability Mass Function: {Math.Round(confidenceScoreProbabilityMassFunctionSum, 5)}");
+                        Console.WriteLine($"Weighted Probability Calculation Details: Scale Factor for PMF: {pmfScaleFactor}");
+                        Console.WriteLine($"Weighted Probability Calculation Details: Weighted (sum of Scores*Probabilities) Confidence Score: {Math.Round(confidenceScoreSum, 5)}");
                     }
-
-                    // 4) Confidence Score Question - Raw answers to the console
-                    Console.ForegroundColor = ConsoleColor.Blue;
-                    Console.WriteLine($"[{responseMessageConfidenceScore.Role.ToString().ToUpperInvariant()} - Confidence Score]: {responseMessageConfidenceScore.Content}");
-
-                    // 5) Confidence Score Question - Process the Confidence Score answer details
-                    var logProbsConfidenceScore = responseConfidenceScore.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability of First Token: " + Math.Round(Math.Exp(a.LogProbability), 10));
-                    // Write out the first token probability
-                    foreach (var logProb in logProbsConfidenceScore)
-                    {
-                        Console.WriteLine($"Confidence Score Answer: {logProb}");
-                    }
-
-                    // 6) Retrieve the Top 5 Log Probability Entries for the Confidence Score
-                    var topLogProbabilityEntriesConfidenceScore = responseConfidenceScore!.Value.Choices[0].LogProbabilityInfo!.TokenLogProbabilityResults!.FirstOrDefault()!.TopLogProbabilityEntries;
-                    
-                    // 7) Calculate the PMF (Probability Mass Function) for the Confidence Score, for only the valid integer tokens
-                    var confidenceScoreProbabilityMassFunctionSum = topLogProbabilityEntriesConfidenceScore.Select(a => int.TryParse(a.Token, out _) ? Math.Exp(a.LogProbability) : 0).Sum();
-                    var pmfScaleFactor = 1 / confidenceScoreProbabilityMassFunctionSum;
-
-                    // 8) Calculate the Weighted (Sum of all the Score*Probability) Confidence Score
-                    var confidenceScoreSum = topLogProbabilityEntriesConfidenceScore.Select(a => int.TryParse(a.Token, out _) ? int.Parse(a.Token) * Math.Exp(a.LogProbability)* pmfScaleFactor : 0).Sum();
-
-                    Console.WriteLine($"Confidence Score Answer: Valid Tokens Probability Mass Function: {Math.Round(confidenceScoreProbabilityMassFunctionSum, 5)}");
-                    Console.WriteLine($"Confidence Score Answer: Scale Factor for PMF - {pmfScaleFactor}");
-                    Console.WriteLine($"Confidence Score Answer: Weighted (sum of Scores*Probabilities) Confidence Score: {Math.Round(confidenceScoreSum, 5)}");
                 }
             }
         }
