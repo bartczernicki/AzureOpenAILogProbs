@@ -44,6 +44,7 @@ namespace AzureOpenAILogProbs
                 As of the end of the 2023 regular season, the team's overall win–loss record is 4,727–5,075–8 (.482).
                 """;
 
+                Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine(sampleWikipediaArticle);
                 Console.WriteLine(string.Empty);
 
