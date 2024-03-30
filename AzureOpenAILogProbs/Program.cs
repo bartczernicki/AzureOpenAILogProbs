@@ -161,9 +161,9 @@ namespace AzureOpenAILogProbs
                     // 8) Calculate the Weighted (Sum of all the Score*Probability) Confidence Score
                     var confidenceScoreSum = topLogProbabilityEntriesConfidenceScore.Select(a => int.TryParse(a.Token, out _) ? int.Parse(a.Token) * Math.Exp(a.LogProbability)* pmfScaleFactor : 0).Sum();
 
-                    Console.WriteLine($"Confidence Score Answer: Valid Tokens Probability Mass Function: {Math.Round(confidenceScoreProbabilityMassFunctionSum, 3)}");
+                    Console.WriteLine($"Confidence Score Answer: Valid Tokens Probability Mass Function: {Math.Round(confidenceScoreProbabilityMassFunctionSum, 5)}");
                     Console.WriteLine($"Confidence Score Answer: Scale Factor for PMF - {pmfScaleFactor}");
-                    Console.WriteLine($"Confidence Score Answer: Weighted (sum of Scores*Probabilities) Confidence Score: {Math.Round(confidenceScoreSum, 3)}");
+                    Console.WriteLine($"Confidence Score Answer: Weighted (sum of Scores*Probabilities) Confidence Score: {Math.Round(confidenceScoreSum, 5)}");
                 }
             }
         }
