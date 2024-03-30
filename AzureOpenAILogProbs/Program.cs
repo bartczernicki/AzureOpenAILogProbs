@@ -10,7 +10,28 @@ namespace AzureOpenAILogProbs
         static async Task Main(string[] args)
         {
             {
-                Console.Title = "GenAI - Azure OpenAI LogProbs";
+                Console.Title = "GenAI - Azure OpenAI LogProbs Examples";
+
+                var asciiBanner = """
+                       #                                   #######                         #    ### 
+                      # #   ###### #    # #####  ######    #     # #####  ###### #    #   # #    #  
+                     #   #      #  #    # #    # #         #     # #    # #      ##   #  #   #   #  
+                    #     #    #   #    # #    # #####     #     # #    # #####  # #  # #     #  #  
+                    #######   #    #    # #####  #         #     # #####  #      #  # # #######  #  
+                    #     #  #     #    # #   #  #         #     # #      #      #   ## #     #  #  
+                    #     # ######  ####  #    # ######    ####### #      ###### #    # #     # ### 
+
+                    #                     ######                                 #######                                                  
+                    #        ####   ####  #     # #####   ####  #####   ####     #       #    #   ##   #    # #####  #      ######  ####  
+                    #       #    # #    # #     # #    # #    # #    # #         #        #  #   #  #  ##  ## #    # #      #      #      
+                    #       #    # #      ######  #    # #    # #####   ####     #####     ##   #    # # ## # #    # #      #####   ####  
+                    #       #    # #  ### #       #####  #    # #    #      #    #         ##   ###### #    # #####  #      #           # 
+                    #       #    # #    # #       #   #  #    # #    # #    #    #        #  #  #    # #    # #      #      #      #    # 
+                    #######  ####   ####  #       #    #  ####  #####   ####     ####### #    # #    # #    # #      ###### ######  #### 
+                    """;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write(asciiBanner);
 
                 ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
                 IConfiguration configuration = configurationBuilder.AddUserSecrets<Program>().Build();
@@ -43,6 +64,35 @@ namespace AzureOpenAILogProbs
                 Since 2020, the Mets have been owned by billionaire hedge fund manager Steve Cohen, who purchased the team for $2.4 billion.[10] As of 2023, Forbes ranked the Mets as the sixth most valuable MLB team, valued at $2.9 billion.
                 As of the end of the 2023 regular season, the team's overall win–loss record is 4,727–5,075–8 (.482).
                 """;
+
+                ProcessingOptions selectedProcessingChoice = (ProcessingOptions) 0;
+                bool validInput = false;
+                while (!validInput)
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine(string.Empty);
+                    Console.WriteLine("Select one of the options to run, by typing either 1 through 3:");
+                    Console.WriteLine("1) First Token Probability - True or False, whether the model has enough info to answer question.");
+                    Console.WriteLine("2) Weighted Probability - Self Confidence Score that is weighted from LogProbs PMF distribution.");
+                    Console.WriteLine("3) Confidence Interval - Calculated from bootstrap of multiple calls to the model.");
+
+                    var insertedText = Console.ReadLine();
+                    string trimmedInput = insertedText!.Trim();
+
+                    if (trimmedInput == "1" || trimmedInput == "2" || trimmedInput == "3")
+                    {
+                        validInput = true;
+                        selectedProcessingChoice = (ProcessingOptions)Int32.Parse(trimmedInput);
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Incorrect selection!!!!");
+                    }
+                }
+                Console.WriteLine("You selected: {0}", selectedProcessingChoice);
+
+
 
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine(sampleWikipediaArticle);
