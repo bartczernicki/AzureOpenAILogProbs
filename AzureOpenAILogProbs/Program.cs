@@ -135,7 +135,7 @@ namespace AzureOpenAILogProbs
                     var topLogProbabilityEntriesConfidenceScore = responseConfidenceScore!.Value.Choices[0].LogProbabilityInfo!.TokenLogProbabilityResults!.FirstOrDefault()!.TopLogProbabilityEntries;
 
                     var confidenceScoreSum = topLogProbabilityEntriesConfidenceScore.Select(a => int.TryParse(a.Token, out _) ? int.Parse(a.Token) * Math.Exp(a.LogProbability) : 0).Sum();
-                    Console.WriteLine(confidenceScoreSum);
+                    Console.WriteLine($"Confidence Score: {Math.Round(confidenceScoreSum, 3)}");
 
                     Console.WriteLine($"[{responseMessageTrueFalse.Role.ToString().ToUpperInvariant()}]: {responseMessageTrueFalse.Content}");
                     Console.WriteLine($"[{responseMessageConfidenceScore.Role.ToString().ToUpperInvariant()}]: {responseMessageConfidenceScore.Content}");
