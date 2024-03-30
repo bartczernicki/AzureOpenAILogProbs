@@ -26,9 +26,9 @@ namespace AzureOpenAILogProbs
                 var modelDeploymentName = azureModelDeploymentName;
 
                 // From this Wikipedia article from the OpenAI Cookbook
-
                 // https://cookbook.openai.com/examples/using_logprobs
-                var wikipediaArticle = """
+
+                var sampleWikipediaArticle = """
                 The New York Mets are an American professional baseball team based in the New York City borough of Queens.
                 The Mets compete in Major League Baseball (MLB) as a member of the National League (NL) East Division.
                 They are one of two major league clubs based in New York City, the other being the American League's (AL) New York Yankees.
@@ -44,11 +44,12 @@ namespace AzureOpenAILogProbs
                 As of the end of the 2023 regular season, the team's overall win–loss record is 4,727–5,075–8 (.482).
                 """;
 
-                Console.WriteLine(wikipediaArticle);
+                Console.WriteLine(sampleWikipediaArticle);
                 Console.WriteLine(string.Empty);
 
                 Console.WriteLine("Process Questions...");
 
+                // List of questions to ask the model
                 var questions = new List<string>
                 {
                 "When where the Mets founded?", // expected: true
@@ -56,7 +57,7 @@ namespace AzureOpenAILogProbs
                 "Who owns the Mets?", // expected: true
                 "Have the Mets won the 2023 World Series?", // expected: false
                 "Who are the Boston Red Sox?", // expected: false
-                "Where the Mets were a bad team in the 1960s", // expected: true
+                "Where the Mets were a bad team in the 1960s?", // expected: true
                 "Are the Mets uniform colors only blue and orange?", // expected: ?
                 "Are the there only 2 Mets uniform colors?", // expected: ?
                 "Do you think the Mets were a historically good team?", // expected: ?
@@ -68,14 +69,14 @@ namespace AzureOpenAILogProbs
                 foreach (var question in questions)
                 {
                     var promptInstructionsTrueFalse = $"""
-                    You retrieved this Wikipedia Article: {wikipediaArticle}. The question is: {question}.
+                    You retrieved this Wikipedia Article: {sampleWikipediaArticle}. The question is: {question}.
                     Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
                     Your output should JUST be the boolean true or false, if you have sufficient information in the Wikipedia article to answer the question.
                     Respond with just one word, the boolean true or false. You must output the word 'True', or the word 'False', nothing else.
                     """;
 
                     var promptInstructionsConfidenceScore = $"""
-                    You retrieved this Wikipedia Article: {wikipediaArticle}. The question is: {question}.
+                    You retrieved this Wikipedia Article: {sampleWikipediaArticle}. The question is: {question}.
                     Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
                     Your output should JUST be the a single confidence score between 1 to 10, if you have sufficient information in the Wikipedia article to answer the question.
                     Respond with just one confidence score number between 1 to 10. You must output a single number, nothing else.
@@ -83,11 +84,11 @@ namespace AzureOpenAILogProbs
 
                     var chatCompletionsOptionsTrueFalse = new ChatCompletionsOptions()
                     {
-                        DeploymentName = modelDeploymentName, // Use DeploymentName for "model" with non-Azure clients
+                        DeploymentName = modelDeploymentName, // Use DeploymentName for "model" with Azure clients
                         Messages =
                         {
                             // The system message represents instructions or other guidance about how the assistant should behave
-                            new ChatRequestSystemMessage("You are a helpful assistant. You will follow the instructions provided in the prompt."),
+                            new ChatRequestSystemMessage("You are an assistant testing large language model features. Follow the instructions provided in the prompt."),
                             // User messages represent current or historical input from the end user
                             new ChatRequestUserMessage(promptInstructionsTrueFalse)
                         }
@@ -95,11 +96,11 @@ namespace AzureOpenAILogProbs
 
                     var chatCompletionOptionsConfidenceScore = new ChatCompletionsOptions()
                     {
-                        DeploymentName = modelDeploymentName, // Use DeploymentName for "model" with non-Azure clients
+                        DeploymentName = modelDeploymentName, // Use DeploymentName for "model" with Azure clients
                         Messages =
                         {
                             // The system message represents instructions or other guidance about how the assistant should behave
-                            new ChatRequestSystemMessage("You are a helpful assistant. You will follow the instructions provided in the prompt."),
+                            new ChatRequestSystemMessage("You are an assistant testing large language model features. Follow the instructions provided in the prompt."),
                             // User messages represent current or historical input from the end user
                             new ChatRequestUserMessage(promptInstructionsConfidenceScore)
                         }
@@ -110,38 +111,59 @@ namespace AzureOpenAILogProbs
                     chatCompletionsOptionsTrueFalse.EnableLogProbabilities = true;
                     chatCompletionOptionsConfidenceScore.Temperature = 0.0f;
                     chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
+                    // For the Confidence Score, we want to see 5 of the top log probabilities (PMF)
                     chatCompletionOptionsConfidenceScore.LogProbabilitiesPerToken = 5;
 
                     Response<ChatCompletions> responseTrueFalse = await client.GetChatCompletionsAsync(chatCompletionsOptionsTrueFalse);
                     Response<ChatCompletions> responseConfidenceScore = await client.GetChatCompletionsAsync(chatCompletionOptionsConfidenceScore);
 
                     ChatResponseMessage responseMessageTrueFalse = responseTrueFalse.Value.Choices[0].Message;
-                    ChatResponseMessage responseMessageConfidenceScore = responseTrueFalse.Value.Choices[0].Message;
+                    ChatResponseMessage responseMessageConfidenceScore = responseConfidenceScore.Value.Choices[0].Message;
                     Console.ForegroundColor = ConsoleColor.Yellow;
 
+                    // 1) Write the Question to the console
                     Console.WriteLine();
                     Console.WriteLine(question);
                     Console.ResetColor();
 
-                    // https://stackoverflow.com/questions/48465737/how-to-convert-log-probability-into-simple-probability-between-0-and-1-values-us
-                    var logProbsTrueFalse = responseTrueFalse.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability: " + Math.Round(Math.Exp(a.LogProbability), 10));
-                    var logProbsConfidenceScore = responseConfidenceScore.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability: " + Math.Round(Math.Exp(a.LogProbability), 10));
+                    // 2) True/False Question - Raw answers to the console
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine($"[{responseMessageTrueFalse.Role.ToString().ToUpperInvariant()} -       True/False]: {responseMessageTrueFalse.Content}");
 
-                    // write logProbs to console
+                    // 3) True/False Question - Answer Details
+                    // https://stackoverflow.com/questions/48465737/how-to-convert-log-probability-into-simple-probability-between-0-and-1-values-us
+                    var logProbsTrueFalse = responseTrueFalse.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability of First Token: " + Math.Round(Math.Exp(a.LogProbability), 10));
+                    // Write out the first token probability
                     foreach (var logProb in logProbsTrueFalse)
                     {
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine("True/False Answer: " + logProb);
-                        Console.ResetColor();
+                        Console.WriteLine($"True/False Answer: {logProb}");
                     }
 
+                    // 4) Confidence Score Question - Raw answers to the console
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.WriteLine($"[{responseMessageConfidenceScore.Role.ToString().ToUpperInvariant()} - Confidence Score]: {responseMessageConfidenceScore.Content}");
+
+                    // 5) Confidence Score Question - Process the Confidence Score answer details
+                    var logProbsConfidenceScore = responseConfidenceScore.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability of First Token: " + Math.Round(Math.Exp(a.LogProbability), 10));
+                    // Write out the first token probability
+                    foreach (var logProb in logProbsConfidenceScore)
+                    {
+                        Console.WriteLine($"Confidence Score Answer: {logProb}");
+                    }
+
+                    // 6) Retrieve the Top 5 Log Probability Entries for the Confidence Score
                     var topLogProbabilityEntriesConfidenceScore = responseConfidenceScore!.Value.Choices[0].LogProbabilityInfo!.TokenLogProbabilityResults!.FirstOrDefault()!.TopLogProbabilityEntries;
+                    
+                    // 7) Calculate the PMF (Probability Mass Function) for the Confidence Score, for only the valid integer tokens
+                    var confidenceScoreProbabilityMassFunctionSum = topLogProbabilityEntriesConfidenceScore.Select(a => int.TryParse(a.Token, out _) ? Math.Exp(a.LogProbability) : 0).Sum();
+                    var pmfScaleFactor = 1 / confidenceScoreProbabilityMassFunctionSum;
 
-                    var confidenceScoreSum = topLogProbabilityEntriesConfidenceScore.Select(a => int.TryParse(a.Token, out _) ? int.Parse(a.Token) * Math.Exp(a.LogProbability) : 0).Sum();
-                    Console.WriteLine($"Confidence Score: {Math.Round(confidenceScoreSum, 3)}");
+                    // 8) Calculate the Weighted (Sum of all the Score*Probability) Confidence Score
+                    var confidenceScoreSum = topLogProbabilityEntriesConfidenceScore.Select(a => int.TryParse(a.Token, out _) ? int.Parse(a.Token) * Math.Exp(a.LogProbability)* pmfScaleFactor : 0).Sum();
 
-                    Console.WriteLine($"[{responseMessageTrueFalse.Role.ToString().ToUpperInvariant()}]: {responseMessageTrueFalse.Content}");
-                    Console.WriteLine($"[{responseMessageConfidenceScore.Role.ToString().ToUpperInvariant()}]: {responseMessageConfidenceScore.Content}");
+                    Console.WriteLine($"Confidence Score Answer: Valid Tokens Probability Mass Function: {Math.Round(confidenceScoreProbabilityMassFunctionSum, 3)}");
+                    Console.WriteLine($"Confidence Score Answer: Scale Factor for PMF - {pmfScaleFactor}");
+                    Console.WriteLine($"Confidence Score Answer: Weighted (sum of Scores*Probabilities) Confidence Score: {Math.Round(confidenceScoreSum, 3)}");
                 }
             }
         }
