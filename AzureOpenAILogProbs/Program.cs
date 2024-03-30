@@ -148,9 +148,8 @@ namespace AzureOpenAILogProbs
                         Response<ChatCompletions> responseTrueFalse = await client.GetChatCompletionsAsync(chatCompletionsOptionsTrueFalse);
                         ChatResponseMessage responseMessageTrueFalse = responseTrueFalse.Value.Choices[0].Message;
 
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-
                         // 1) Write the Question to the console
+                        Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine();
                         Console.WriteLine(question);
                         Console.ResetColor();
@@ -200,9 +199,9 @@ namespace AzureOpenAILogProbs
                         
                         Response<ChatCompletions> responseConfidenceScore = await client.GetChatCompletionsAsync(chatCompletionOptionsConfidenceScore);
                         ChatResponseMessage responseMessageConfidenceScore = responseConfidenceScore.Value.Choices[0].Message;
-                        Console.ForegroundColor = ConsoleColor.Yellow;
 
                         // 1) Write the Question to the console
+                        Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine();
                         Console.WriteLine(question);
                         Console.ResetColor();
@@ -232,7 +231,108 @@ namespace AzureOpenAILogProbs
                         Console.WriteLine($"Weighted Probability Calculation Details: Valid Tokens Probability Mass Function: {Math.Round(confidenceScoreProbabilityMassFunctionSum, 5)}");
                         Console.WriteLine($"Weighted Probability Calculation Details: Scale Factor for PMF: {pmfScaleFactor}");
                         Console.WriteLine($"Weighted Probability Calculation Details: Weighted (sum of Scores*Probabilities) Confidence Score: {Math.Round(confidenceScoreSum, 5)}");
+                    } // end of foreach question loop
+                }
+                else if (selectedProcessingChoice == ProcessingOptions.ConfidenceInterval)
+                {
+                    // On this run, we will use a single question but run it multiple times to calculate the Confidence Interval
+                    var question = "Has Steve Cohen been the longest-serving owner of the Mets?";
+
+                    // 1) Write the Question to the console
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine();
+                    Console.WriteLine(question);
+                    Console.ResetColor();
+
+                    // 2) Set up the prompt instructions and configuration for the Confidence Interval, it will be used for the loop
+                    var promptInstructionsConfidenceScore = $"""
+                        You retrieved this Wikipedia Article: {sampleWikipediaArticle}. The question is: {question}.
+                        Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
+                        Your output should JUST be the a single confidence score between 1 to 10, if you have sufficient information in the Wikipedia article to answer the question.
+                        Respond with just one confidence score number between 1 to 10. You must output a single number, nothing else.
+                        """;
+
+                    var chatCompletionOptionsConfidenceScore = new ChatCompletionsOptions()
+                    {
+                        DeploymentName = modelDeploymentName, // Use DeploymentName for "model" with Azure clients
+                        Messages =
+                            {
+                                // The system message represents instructions or other guidance about how the assistant should behave
+                                new ChatRequestSystemMessage("You are an assistant testing large language model features. Follow the instructions provided in the prompt."),
+                                // User messages represent current or historical input from the end user
+                                new ChatRequestUserMessage(promptInstructionsConfidenceScore)
+                            }
+                    };
+
+                    chatCompletionOptionsConfidenceScore.Temperature = 0.0f;
+                    chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
+                    // For the Confidence Score, we want to see 5 of the top log probabilities (PMF)
+                    chatCompletionOptionsConfidenceScore.LogProbabilitiesPerToken = 5;
+
+                    // Loop through the Confidence Score question multiple times
+                    var weightedConfidenceScores = new List<double>();
+                    for (int i =0; i != 10; i++)
+                    {
+                        Response<ChatCompletions> responseConfidenceScore = await client.GetChatCompletionsAsync(chatCompletionOptionsConfidenceScore);
+                        ChatResponseMessage responseMessageConfidenceScore = responseConfidenceScore.Value.Choices[0].Message;
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+
+                        // 2) Confidence Score Question - Raw answers to the console
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine($"[{responseMessageConfidenceScore.Role.ToString().ToUpperInvariant()} - Confidence Score]: {responseMessageConfidenceScore.Content}");
+
+                        // 3) Confidence Score Question - Process the Confidence Score answer details
+                        var logProbsConfidenceScore = responseConfidenceScore.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability of First Token: " + Math.Round(Math.Exp(a.LogProbability), 10));
+                        // Write out the first token probability
+                        foreach (var logProb in logProbsConfidenceScore)
+                        {
+                            Console.WriteLine($"Weighted Probability Calculation Details: {logProb}");
+                        }
+
+                        // 4) Retrieve the Top 5 Log Probability Entries for the Confidence Score
+                        var topLogProbabilityEntriesConfidenceScore = responseConfidenceScore!.Value.Choices[0].LogProbabilityInfo!.TokenLogProbabilityResults!.FirstOrDefault()!.TopLogProbabilityEntries;
+
+                        // 5) Calculate the PMF (Probability Mass Function) for the Confidence Score, for only the valid integer tokens
+                        var confidenceScoreProbabilityMassFunctionSum = topLogProbabilityEntriesConfidenceScore.Select(a => int.TryParse(a.Token, out _) ? Math.Exp(a.LogProbability) : 0).Sum();
+                        var pmfScaleFactor = 1 / confidenceScoreProbabilityMassFunctionSum;
+
+                        // 6) Calculate the Weighted (Sum of all the Score*Probability) Confidence Score
+                        var confidenceScoreSum = topLogProbabilityEntriesConfidenceScore.Select(a => int.TryParse(a.Token, out _) ? int.Parse(a.Token) * Math.Exp(a.LogProbability) * pmfScaleFactor : 0).Sum();
+                        weightedConfidenceScores.Add(confidenceScoreSum);
+
+                        Console.WriteLine($"Weighted Probability Calculation Details: Valid Tokens Probability Mass Function: {Math.Round(confidenceScoreProbabilityMassFunctionSum, 5)}");
+                        Console.WriteLine($"Weighted Probability Calculation Details: Scale Factor for PMF: {pmfScaleFactor}");
+                        Console.WriteLine($"Weighted Probability Calculation Details: Weighted (sum of Scores*Probabilities) Confidence Score: {Math.Round(confidenceScoreSum, 5)}");
+                    } // end of for loop
+
+                    // Write a bootstrap simulation of the average of weightedConfidenceScores
+                    // Sample with replacement from the weightedConfidenceScores
+                    var random = new Random(100);
+                    var bootstrapConfidenceScores = new List<double>();
+                    for (int i = 0; i != 1000; i++)
+                    {
+                        var bootstrapSample = new List<double>();
+                        for (int j = 0; j != 100; j++)
+                        {
+                            var randomIndex = random.Next(0, weightedConfidenceScores.Count);
+                            bootstrapSample.Add(weightedConfidenceScores[randomIndex]);
+                        }
+                        bootstrapConfidenceScores.Add(bootstrapSample.Average());
                     }
+
+                    // Calculate the 95% Confidence Interval
+                    var bootstrapConfidenceScoresSorted = bootstrapConfidenceScores.OrderBy(a => a).ToList();
+                    // Calculate the min and the max
+                    var minimumScore = Math.Round(bootstrapConfidenceScoresSorted.Min(), 3);
+                    var maximumScore = Math.Round(bootstrapConfidenceScoresSorted.Max(), 3);
+                    // Calculate the 2.5% and 97.5% percentiles
+                    var lowerPercentile = Math.Round(bootstrapConfidenceScoresSorted[25], 3);
+                    var upperPercentile = Math.Round(bootstrapConfidenceScoresSorted[975], 3);
+                    Console.WriteLine();
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"Weighted Probability Calculation Details: Minimum & Maximum Range: {minimumScore} - {maximumScore}");
+                    Console.WriteLine($"Weighted Probability Calculation Details: 95% Confidence Score Interval: {lowerPercentile} - {upperPercentile}");
+                    Console.ResetColor();
                 }
             }
         }
