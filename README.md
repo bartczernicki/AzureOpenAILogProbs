@@ -32,6 +32,7 @@ This tremendous capability can empower the AI system to self-correct or guide th
 In the set of processing examples below, we will simulate a parallel call to the model to gauge the confidence.
 This is illustrated below with the diagram:  
 
+![Azure LogProbs Workflow](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/Images/AzureLogProbs-LogProbsWorkflow.png)  
 
 
 ## Console Processing Options  
@@ -76,9 +77,10 @@ Example Output:
 ## Further Advanced Considerations  
 This article did not touch on the calibration of the model's confidence score nor the calibration of the model's probability LogProbs.
 Because LLMs are essentially neural networks, they can be be uncalibrated for specific tasks or domains.
-The topic of calibration is not new and has been studied in decision theory and machine learning.
 Basically, when the LLM says it is 8/10 confident or probability of 80%, the model should be correct 80% of the time.  
 
   * A model that answered 100 questions with a confidence score of 80%, it should be correct 80 times. That would reflect perfect calibration.  
   * A model that answered 100 questions with a confidence score of 80% and was only correct 60 times would be overconfident.  
   * A model that answered 100 questions with a confidence score of 80% and was correct 90 times would be underconfident.  
+
+  The topic of calibration is not new and has been studied in decision theory and machine learning.
