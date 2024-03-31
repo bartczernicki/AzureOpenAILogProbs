@@ -1,5 +1,7 @@
 ## Azure OpenAI LogProbs Examples  
-   * Console application that shows 
-     * Q&A Over Vector Database Pipeline - Searches the SQL Vector Database with provided question phrase using Semantic Kernel
-   * Total Text (OpenAI) Tokens Processed:...............8,267,408    
-   * Total Text (Characters) Length Processed:..........33,702,085  
+   * .NET Console application that shows an implementation of Azure OpenAI Log Probs that can be useful for RAG implemenations:
+     * Calculate First Token Probability - True or False probability, whether the (LLM) model has enough info to answer question  
+     * Weighted Probability of Confidence Score - Self Confidence Score that is weighted from LogProbs PMF distribution to give a better confidence score estimate of confidence to answer a question
+     * Confidence Interval - Calculated from bootstrap simulation of multiple calls to the model. This provides a 96% confidence interval (range) of plausible confidence scores. This is ideal when you need to understand a range of possibilities the model interprets rather than a single point estimate.
+    
+     
