@@ -6,7 +6,7 @@
 
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/Images/AzureLogProbsConsoleApp.png)
 
-## Add this to the User Secrets (Right Click on Project -> Manage User Secrets)
+## Get Started: Add this to the User Secrets (Right Click on Project -> Manage User Secrets)
 ```javascript
 {
   "AzureOpenAI": {
