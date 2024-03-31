@@ -75,7 +75,7 @@ namespace AzureOpenAILogProbs
                 while (!validInput)
                 {
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine(string.Empty);
+                    Console.WriteLine(string.Empty); 
                     Console.WriteLine("Select one of the options to run, by typing either 1 through 3:");
                     Console.WriteLine("1) First Token Probability - True or False, whether the model has enough info to answer question.");
                     Console.WriteLine("2) Weighted Probability of Confidence Score - Self Confidence Score that is weighted from LogProbs PMF distribution.");
