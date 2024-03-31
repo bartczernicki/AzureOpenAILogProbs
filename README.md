@@ -51,7 +51,7 @@ Example Output:
    * The wighted probability is calculated by multiplication: confidence score*probability to give a better weighted estimate of the confidence to answer the question.  
    * The weighted probability can be used as a better calibrated confidence score for the model's response.  
 
-Note you have to enable LogProbs and set the LogProbabilitiesPerToken to 5 (max):  
+Note you have to enable LogProbs and set the LogProbabilitiesPerToken to 5 (current maximum, as of this writing):  
 ```chsarp
 chatCompletionOptionsConfidenceScore.Temperature = 0.0f;
 chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
@@ -72,3 +72,13 @@ Example Output:
 
 Example Output:  
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/Images/ProcessOption-ConfidenceScoreInterval.png)  
+
+## Further Advanced Considerations  
+This article did not touch on the calibration of the model's confidence score nor the calibration of the model's probability LogProbs.
+Because LLMs are essentially neural networks, they can be be uncalibrated for specific tasks or domains.
+The topic of calibration is not new and has been studied in decision theory and machine learning.
+Basically, when the LLM says it is 8/10 confident or probability of 80%, the model should be correct 80% of the time.  
+
+  * A model that answered 100 questions with a confidence score of 80%, it should be correct 80 times. That would reflect perfect calibration.  
+  * A model that answered 100 questions with a confidence score of 80% and was only correct 60 times would be overconfident.  
+  * A model that answered 100 questions with a confidence score of 80% and was correct 90 times would be underconfident.  

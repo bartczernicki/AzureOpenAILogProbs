@@ -135,8 +135,8 @@ namespace AzureOpenAILogProbs
                         -- END OF QUESTION--
                         INSTRUCTIONS: 
                         Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
-                        Your output should JUST be the boolean true or false, if you have sufficient information in the Wikipedia article to answer the question.
-                        Respond with just one word, the boolean true or false. You must output the word 'True', or the word 'False', nothing else.
+                        Your output should JUST be the Boolean true or false, if you have sufficient information in the Wikipedia article to answer the question.
+                        Respond with just one word, the Boolean true or false. You must output the word 'True', or the word 'False', nothing else.
                         """;
 
                         var chatCompletionsOptionsTrueFalse = new ChatCompletionsOptions()
