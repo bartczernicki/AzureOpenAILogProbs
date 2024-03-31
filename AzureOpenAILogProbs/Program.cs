@@ -2,6 +2,7 @@
 using Azure;
 using Microsoft.Extensions.Configuration;
 using System;
+using Azure.Core;
 
 namespace AzureOpenAILogProbs
 {
@@ -41,9 +42,11 @@ namespace AzureOpenAILogProbs
                 var azureOpenAIEndpoint = configuration.GetSection("AzureOpenAI")["Endpoint"];
                 var azureModelDeploymentName = configuration.GetSection("AzureOpenAI")["ModelDeploymentName"];
 
+                // Define the OpenAI Client Options, increase max retries and delay for the exponential backoff
+                OpenAIClientOptions openAIClientOptions = new OpenAIClientOptions { Retry = { Delay = TimeSpan.FromSeconds(2), MaxDelay = TimeSpan.FromSeconds(30), MaxRetries = 5, Mode = RetryMode.Exponential } };
                 Uri azureOpenAIResourceUri = new(azureOpenAIEndpoint!);
                 AzureKeyCredential azureOpenAIApiKey = new(azureOpenAIAPIKey!);
-                OpenAIClient client = new(azureOpenAIResourceUri, azureOpenAIApiKey);
+                OpenAIClient client = new(azureOpenAIResourceUri, azureOpenAIApiKey, openAIClientOptions);
 
                 var modelDeploymentName = azureModelDeploymentName;
 
@@ -263,7 +266,15 @@ namespace AzureOpenAILogProbs
 
                     // 2) Set up the prompt instructions and configuration for the Confidence Interval, it will be used for the loop
                     var promptInstructionsConfidenceScore = $"""
-                        You retrieved this Wikipedia Article: {sampleWikipediaArticle}. The question is: {question}.
+                        Using this Wikipedia Article as the ONLY source of information: 
+                        --START OF WIKIPEDIA ARTICLE--
+                        {sampleWikipediaArticle}
+                        -- END OF WIKIPEDIA ARTICLE--
+                        The question is: 
+                        -- START OF QUESTION--
+                        {question}
+                        -- END OF QUESTION--
+                        INSTRUCTIONS: 
                         Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
                         Your output should JUST be the a single confidence score between 1 to 10, if you have sufficient information in the Wikipedia article to answer the question.
                         Respond with just one confidence score number between 1 to 10. You must output a single number, nothing else.
