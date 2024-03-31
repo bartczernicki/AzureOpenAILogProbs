@@ -5,3 +5,14 @@
      * Confidence Interval - Calculated from bootstrap simulation of multiple calls to the model. This provides a 96% confidence interval (range) of plausible confidence scores. This is ideal when you need to understand a range of possibilities the model interprets rather than a single point estimate.
 
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/Images/AzureLogProbsConsoleApp.png)
+
+## Add this to the User Secrets (Right Click on Project -> Manage User Secrets)
+```javascript
+{
+  "AzureOpenAI": {
+    "ModelDeploymentName": "gpt-4-0125-preview", // Any Azure OpenAI GPT-4 model should perform well
+    "APIKey": "YOURAZUREOPENAIKEY",
+    "Endpoint": "https://YOURAZUREOPENAIENDPOINT.openai.azure.com/"
+  }
+}
+```
