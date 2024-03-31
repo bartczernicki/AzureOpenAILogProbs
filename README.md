@@ -1,5 +1,5 @@
 ## Azure OpenAI LogProbs Examples  
-   * .NET Console application that shows examples how Azure OpenAI Log Probs that can be useful for RAG implemenations:
+   * .NET Console application that shows examples how Azure OpenAI Log Probs that can be useful for RAG implementations:
      * Calculate First Token Probability - True or False probability, determine whether the (LLM) model has enough info to answer question  
      * Weighted Probability of Confidence Score - Self Confidence Score that is weighted from LogProbs probability (PMF) distribution to give a better (weighted) confidence score estimate to answer a question
      * Confidence Interval - Calculated from bootstrap simulation of multiple calls to the model. This provides a 95% confidence interval (range) of plausible confidence scores. This is ideal when you need to understand a range of possibilities the model interprets rather than a single point estimate.
@@ -41,7 +41,7 @@ This is illustrated below with the diagram:
    * Uses the Azure OpenAI LogProbs to determine the probability of the first token in the response.
    * If the probability is high, it is likely the model has enough information to answer the question.  
    * If the probability is low, it is likely the model does not have enough information to answer the question.  
-   * The probability can be used as a decision threshhold for a binary classification of whether the model has enough information (RAG context) to answer the question.     
+   * The probability can be used as a decision threshold for a binary classification of whether the model has enough information (RAG context) to answer the question.     
 
 Example Output:
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/Images/ProcessOption-FirstTokenProbability.png)  
@@ -49,7 +49,7 @@ Example Output:
 ### 2) Weighted Probability of Confidence Score  
    * Azure OpenAI LogProbs can return a probability mass function (PMF) distribution of up to the next 5 tokens including their probabilities.  
    * This calculation uses multiple LogProbs to determine the "weighted" probability of the response.  
-   * The wighted probability is calculated by multiplication: confidence score*probability to give a better weighted estimate of the confidence to answer the question.  
+   * The weighted probability is calculated by multiplication: confidence score*probability to give a better weighted estimate of the confidence to answer the question.  
    * The weighted probability can be used as a better calibrated confidence score for the model's response.  
 
 Note you have to enable LogProbs and set the LogProbabilitiesPerToken to 5 (current maximum, as of this writing):  
@@ -76,7 +76,7 @@ Example Output:
 
 ## Further Advanced Considerations  
 This article did not touch on the calibration of the model's confidence score nor the calibration of the model's probability LogProbs.
-Because LLMs are essentially neural networks, they can be be uncalibrated for specific tasks or domains.
+Because LLMs are essentially neural networks, they can be uncalibrated for specific tasks or domains.
 Basically, when the LLM says it is 8/10 confident or probability of 80%, the model should be correct 80% of the time.  
 
   * A model that answered 100 questions with a confidence score of 80%, it should be correct 80 times. That would reflect perfect calibration.  
@@ -84,6 +84,6 @@ Basically, when the LLM says it is 8/10 confident or probability of 80%, the mod
   * A model that answered 100 questions with a confidence score of 80% and was correct 95 times would be underconfident. Note: This is outside the expected error range.  
 
   The topic of calibration is not new and has been studied in decision theory and machine learning.
-  You can apply both decision intelligeence (cognitive science) and machiine learning techniques to further calibrate the model performance.
+  You can apply both decision intelligence (cognitive science) and machine learning techniques to further calibrate the model performance.
   * Calibrating Chat GPT for Its Overconfidence: https://hubbardresearch.com/chat-gpt-ai-calibration/  
   * Calibrating LLM-Based Evaluator: https://arxiv.org/pdf/2309.13308.pdf  
