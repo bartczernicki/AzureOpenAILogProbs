@@ -81,8 +81,8 @@ Because LLMs are essentially neural networks, they can be uncalibrated for speci
 Basically, when the LLM says it is 8/10 confident or probability of 80%, the model should be correct 80% of the time.  
 
   * A model that answered 100 questions with a confidence score of 80%, it should be correct about 80 times (95% CI for this is between 77 and 83 expected correct answers). That would reflect perfect calibration.  
-  * A model that answered 100 questions with a confidence score of 80% and was only correct 50 times would be overconfident. Note: This is outside the expected error range.  
-  * A model that answered 100 questions with a confidence score of 80% and was correct 95 times would be underconfident. Note: This is outside the expected error range.  
+  * A model that answered 100 questions with a confidence score of 80% and was only correct 50 times would be overconfident. Note: This is well outside the expected error range.  
+  * A model that answered 100 questions with a confidence score of 80% and was correct 95 times would be underconfident. Note: This is well outside the expected error range.  
 
   The topic of calibration is not new and has been studied in decision theory and machine learning.
   You can apply both decision intelligence (cognitive science) and machine learning techniques to further calibrate the model performance.
