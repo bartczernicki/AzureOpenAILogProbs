@@ -95,14 +95,12 @@ namespace AzureOpenAILogProbs
                         Console.WriteLine("Incorrect selection!!!!");
                     }
                 }
-                Console.WriteLine(string.Empty);
-                Console.WriteLine("You selected: {0}", selectedProcessingChoice);
+                Console.WriteLine("\r\nYou selected: {0}\r\n", selectedProcessingChoice);
 
                 Console.ForegroundColor= ConsoleColor.Magenta;
                 Console.WriteLine("Using the following Wikipedia Article as grounding information for questions...");
                 Console.ForegroundColor = ConsoleColor.Gray;
-                Console.WriteLine(sampleWikipediaArticle);
-                Console.WriteLine(string.Empty);
+                Console.WriteLine($"{sampleWikipediaArticle}\r\n");
 
                 // DEfine sample list of questions to ask the model
                 var questions = new List<string>
@@ -171,7 +169,7 @@ namespace AzureOpenAILogProbs
 
                         // 3) True/False Question - Answer Details
                         // https://stackoverflow.com/questions/48465737/how-to-convert-log-probability-into-simple-probability-between-0-and-1-values-us
-                        var logProbsTrueFalse = responseTrueFalse.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability of First Token: " + Math.Round(Math.Exp(a.LogProbability), 10));
+                        var logProbsTrueFalse = responseTrueFalse.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability of First Token (LLM Probability of having enough info for question): " + Math.Round(Math.Exp(a.LogProbability), 8));
                         // Write out the first token probability
                         foreach (var logProb in logProbsTrueFalse)
                         {
@@ -232,11 +230,20 @@ namespace AzureOpenAILogProbs
                         Console.WriteLine($"[{responseMessageConfidenceScore.Role.ToString().ToUpperInvariant()} - Confidence Score]: {responseMessageConfidenceScore.Content}");
 
                         // 3) Confidence Score Question - Process the Confidence Score answer details
-                        var logProbsConfidenceScore = responseConfidenceScore.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability of First Token: " + Math.Round(Math.Exp(a.LogProbability), 10));
+                        var logProbsConfidenceScore = responseConfidenceScore.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability of First Token (LLM Probability of Self-Confidence Score in having enough info for question): " + Math.Round(Math.Exp(a.LogProbability), 8));
                         // Write out the first token probability
                         foreach (var logProb in logProbsConfidenceScore)
                         {
                             Console.WriteLine($"Weighted Probability Calculation Details: {logProb}");
+                        }
+                        // Write out up to the first 5 valid tokens (integers that match prompt instructions)
+                        foreach (var tokenLogProbabilityResult in responseConfidenceScore!.Value.Choices[0].LogProbabilityInfo!.TokenLogProbabilityResults!.FirstOrDefault()!.TopLogProbabilityEntries)
+                        {
+                            if (int.TryParse(tokenLogProbabilityResult.Token, out _))
+                            {
+                                Console.WriteLine($"\tWeighted Probability Calculation Details: Confidence Score: {tokenLogProbabilityResult.Token} | {Math.Round(Math.Exp(tokenLogProbabilityResult.LogProbability), 8)}");
+                            }
+
                         }
 
                         // 4) Retrieve the Top 5 Log Probability Entries for the Confidence Score
@@ -298,7 +305,7 @@ namespace AzureOpenAILogProbs
                     // For the Confidence Score, we want to see 5 of the top log probabilities (PMF)
                     chatCompletionOptionsConfidenceScore.LogProbabilitiesPerToken = 5;
 
-                    // Loop through the Confidence Score question multiple times
+                    // Loop through the Confidence Score question multiple times (10x)
                     var weightedConfidenceScores = new List<double>();
                     for (int i =0; i != 10; i++)
                     {
@@ -311,11 +318,21 @@ namespace AzureOpenAILogProbs
                         Console.WriteLine($"[{responseMessageConfidenceScore.Role.ToString().ToUpperInvariant()} - Confidence Score]: {responseMessageConfidenceScore.Content}");
 
                         // 3) Confidence Score Question - Process the Confidence Score answer details
-                        var logProbsConfidenceScore = responseConfidenceScore.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability of First Token: " + Math.Round(Math.Exp(a.LogProbability), 10));
+                        var logProbsConfidenceScore = responseConfidenceScore.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => $"Confidence Score: {a.Token} | Probability of First Token: {Math.Round(Math.Exp(a.LogProbability), 10)}");
+                        
                         // Write out the first token probability
                         foreach (var logProb in logProbsConfidenceScore)
                         {
                             Console.WriteLine($"Weighted Probability Calculation Details: {logProb}");
+                        }
+                        // Write out up to the first 5 valid tokens (integers that match prompt instructions)
+                        foreach (var tokenLogProbabilityResult in responseConfidenceScore!.Value.Choices[0].LogProbabilityInfo!.TokenLogProbabilityResults!.FirstOrDefault()!.TopLogProbabilityEntries)
+                        {
+                            if (int.TryParse(tokenLogProbabilityResult.Token, out _))
+                            {
+                                Console.WriteLine($"\tWeighted Probability Calculation Details: Confidence Score: {tokenLogProbabilityResult.Token} | {Math.Round(Math.Exp(tokenLogProbabilityResult.LogProbability), 8)}");
+                            }
+
                         }
 
                         // 4) Retrieve the Top 5 Log Probability Entries for the Confidence Score
