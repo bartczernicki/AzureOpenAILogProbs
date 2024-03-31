@@ -237,11 +237,14 @@ namespace AzureOpenAILogProbs
                             Console.WriteLine($"Weighted Probability Calculation Details: {logProb}");
                         }
                         // Write out up to the first 5 valid tokens (integers that match prompt instructions)
+                        Console.WriteLine("\tProbability Distribution (PMF) for the Confidence Score (Top 5 LogProbs tokens):");
                         foreach (var tokenLogProbabilityResult in responseConfidenceScore!.Value.Choices[0].LogProbabilityInfo!.TokenLogProbabilityResults!.FirstOrDefault()!.TopLogProbabilityEntries)
                         {
                             if (int.TryParse(tokenLogProbabilityResult.Token, out _))
                             {
-                                Console.WriteLine($"\tWeighted Probability Calculation Details: Confidence Score: {tokenLogProbabilityResult.Token} | {Math.Round(Math.Exp(tokenLogProbabilityResult.LogProbability), 8)}");
+                                Console.ForegroundColor = ConsoleColor.Blue;
+                                Console.WriteLine($"\tConfidence Score: {tokenLogProbabilityResult.Token} | Probability: {Math.Round(Math.Exp(tokenLogProbabilityResult.LogProbability), 8)}");
+                                Console.ForegroundColor = ConsoleColor.Cyan;
                             }
 
                         }
@@ -326,11 +329,14 @@ namespace AzureOpenAILogProbs
                             Console.WriteLine($"Weighted Probability Calculation Details: {logProb}");
                         }
                         // Write out up to the first 5 valid tokens (integers that match prompt instructions)
+                        Console.WriteLine("\tProbability Distribution (PMF) for the Confidence Score (Top 5 LogProbs tokens):");
                         foreach (var tokenLogProbabilityResult in responseConfidenceScore!.Value.Choices[0].LogProbabilityInfo!.TokenLogProbabilityResults!.FirstOrDefault()!.TopLogProbabilityEntries)
                         {
                             if (int.TryParse(tokenLogProbabilityResult.Token, out _))
                             {
-                                Console.WriteLine($"\tWeighted Probability Calculation Details: Confidence Score: {tokenLogProbabilityResult.Token} | {Math.Round(Math.Exp(tokenLogProbabilityResult.LogProbability), 8)}");
+                                Console.ForegroundColor = ConsoleColor.Blue;
+                                Console.WriteLine($"\tConfidence Score: {tokenLogProbabilityResult.Token} | Probability: {Math.Round(Math.Exp(tokenLogProbabilityResult.LogProbability), 8)}");
+                                Console.ForegroundColor = ConsoleColor.Cyan;
                             }
 
                         }
@@ -349,6 +355,7 @@ namespace AzureOpenAILogProbs
                         Console.WriteLine($"Weighted Probability Calculation Details: Valid Tokens Probability Mass Function: {Math.Round(confidenceScoreProbabilityMassFunctionSum, 5)}");
                         Console.WriteLine($"Weighted Probability Calculation Details: Scale Factor for PMF: {pmfScaleFactor}");
                         Console.WriteLine($"Weighted Probability Calculation Details: Weighted (sum of Scores*Probabilities) Confidence Score: {Math.Round(confidenceScoreSum, 5)}");
+                        Console.WriteLine();
                     } // end of for loop
 
                     // Write a bootstrap simulation of the average of weightedConfidenceScores
