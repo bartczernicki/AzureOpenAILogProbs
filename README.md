@@ -16,3 +16,9 @@
   }
 }
 ```
+
+![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/Images/ProcessOption-FirstTokenProbability.png)  
+
+![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/Images/ProcessOption-ConfidenceScoreWeightedProbability.png)  
+
+![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/Images/ProcessOption-ConfidenceScoreInterval.png)  
