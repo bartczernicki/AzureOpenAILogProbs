@@ -29,10 +29,11 @@ namespace AzureOpenAILogProbs
                     #       #    # #    # #       #   #  #    # #    # #    #    #        #  #  #    # #    # #      #      #      #    # 
                     #######  ####   ####  #       #    #  ####  #####   ####     ####### #    # #    # #    # #      ###### ######  #### 
                     """;
-
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Write(asciiBanner);
+                Console.WriteLine(string.Empty);
 
+                // Azure OpenAI Configuration from user secrets
                 ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
                 IConfiguration configuration = configurationBuilder.AddUserSecrets<Program>().Build();
 
@@ -46,6 +47,7 @@ namespace AzureOpenAILogProbs
 
                 var modelDeploymentName = azureModelDeploymentName;
 
+                // Define a sample Wikipedia Article to use as grounding information for the questions
                 // https://en.wikipedia.org/wiki/New_York_Mets 
                 var sampleWikipediaArticle = """
                 The New York Mets are an American professional baseball team based in the New York City borough of Queens.
@@ -63,7 +65,7 @@ namespace AzureOpenAILogProbs
                 As of the end of the 2023 regular season, the team's overall win–loss record is 4,727–5,075–8 (.482).
                 """;
 
-                // Processing Options
+                // User input selection - Processing Options
                 ProcessingOptions selectedProcessingChoice = (ProcessingOptions) 0;
                 bool validInput = false;
                 while (!validInput)
@@ -98,7 +100,7 @@ namespace AzureOpenAILogProbs
                 Console.WriteLine(sampleWikipediaArticle);
                 Console.WriteLine(string.Empty);
 
-                // List of questions to ask the model
+                // DEfine sample list of questions to ask the model
                 var questions = new List<string>
                 {
                 "When where the Mets founded?", // expected: true
@@ -115,13 +117,21 @@ namespace AzureOpenAILogProbs
                 "Is Citi Field located on the exact original site of Shea Stadium?" // expected: ?
                 };
 
-
+                // Process the selected option
                 if (selectedProcessingChoice == (ProcessingOptions.FirstTokenProbability))
                 {
                     foreach (var question in questions)
                     {
                         var promptInstructionsTrueFalse = $"""
-                        You retrieved this Wikipedia Article: {sampleWikipediaArticle}. The question is: {question}.
+                        Using this Wikipedia Article as the ONLY source of information: 
+                        --START OF WIKIPEDIA ARTICLE--
+                        {sampleWikipediaArticle}
+                        -- END OF WIKIPEDIA ARTICLE--
+                        The question is: 
+                        -- START OF QUESTION--
+                        {question}
+                        -- END OF QUESTION--
+                        INSTRUCTIONS: 
                         Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
                         Your output should JUST be the boolean true or false, if you have sufficient information in the Wikipedia article to answer the question.
                         Respond with just one word, the boolean true or false. You must output the word 'True', or the word 'False', nothing else.
@@ -173,8 +183,15 @@ namespace AzureOpenAILogProbs
                     foreach (var question in questions)
                     {
                         var promptInstructionsConfidenceScore = $"""
-                        You retrieved this Wikipedia Article: {sampleWikipediaArticle}. The question is: {question}.
-                        Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
+                        Using this Wikipedia Article as the ONLY source of information: 
+                        --START OF WIKIPEDIA ARTICLE--
+                        {sampleWikipediaArticle}
+                        -- END OF WIKIPEDIA ARTICLE--
+                        The question is: 
+                        -- START OF QUESTION--
+                        {question}
+                        -- END OF QUESTION--
+                        INSTRUCTIONS: Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
                         Your output should JUST be the a single confidence score between 1 to 10, if you have sufficient information in the Wikipedia article to answer the question.
                         Respond with just one confidence score number between 1 to 10. You must output a single number, nothing else.
                         """;
