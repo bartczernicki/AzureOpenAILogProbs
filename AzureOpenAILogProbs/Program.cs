@@ -12,23 +12,6 @@ namespace AzureOpenAILogProbs
         static async Task Main(string[] args)
         {
             {
-                //var test = new List<double> { 1.4378636582292377, 1.2681115441821587, 2.7703085251236388, 1.7518824111614655, 1.7556932211393805, 1.58980894303536, 1.289892805203384, 2.37969109234866, 1.5307432730766741, 1.2681115441821587 };
-                //var bootList = new List<double>();
-                //var randomT = new Random();
-                //for (int i = 0; i != 1000; i++) // 1,000 Bootstrap Simulations (bootstrap estimates)
-                //{
-                //    var bootstrapSample = new List<double>();
-                //    for (int j = 0; j != 10; j++) // Keep the sample size at least 30, could be higher to reduce variance/error
-                //    {
-                //        var randomIndex = randomT.Next(0, test.Count);
-                //        bootstrapSample.Add(test[randomIndex]);
-                //    }
-                //    bootList.Add(bootstrapSample.Average());
-                //}
-
-                //var testStdDev = bootList.StandardDeviation();
-                //var testSrdError = testStdDev / Math.Sqrt(test.Count);
-
                 Console.Title = "GenAI - Azure OpenAI LogProbs Examples";
 
                 var asciiBanner = """
