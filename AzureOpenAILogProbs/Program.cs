@@ -212,7 +212,7 @@ namespace AzureOpenAILogProbs
 
                         chatCompletionOptionsConfidenceScore.Temperature = 0.0f;
                         chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
-                        // For the Confidence Score, we want to see 5 of the top log probabilities (PMF)
+                        // For the Confidence Score, we want to see 5 of the top log probabilities (PMF); 5 is currently the max
                         chatCompletionOptionsConfidenceScore.LogProbabilitiesPerToken = 5;
 
                         

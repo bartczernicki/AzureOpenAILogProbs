@@ -16,7 +16,25 @@
   }
 }
 ```
-## Processing Options  
+## Background Information  
+
+Recommended Reading on the background of Azure OpenAI LogProbs:  
+   * OpenAI Cookbook - LogProbs: https://cookbook.openai.com/examples/using_logprobs  
+   * What are logprobs?: https://www.ignorance.ai/p/what-are-logprobs  
+
+These examples focus on reducing hallucinations and improving the reliability of the model's responses.
+There are many techniques that use multiple calls to a model or several models to arrive at a response, conclusion or a decision.
+A plurality of ways LLMs are used in GenAI production systems is with grounding (RAG) with additional context.
+The model is asked to answer a question, reason over that information etc. However, with poor grounding, this can result in poor results.  
+
+The Azure OpenAI LogProbs can be used to gauge the confidence (probability) of the model's response.
+This tremendous capability can empower the AI system to self-correct or guide the user/agent to arrive at a better response.
+In the set of processing examples below, we will simulate a parallel call to the model to gauge the confidence.
+This is illustrated below with the diagram:  
+
+
+
+## Console Processing Options  
 
 ### 1) First Token Probability  
    * Uses the Azure OpenAI LogProbs to determine the probability of the first token in the response.
