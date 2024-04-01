@@ -75,7 +75,7 @@ Example Output:
 Example Output:  
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-ConfidenceScoreInterval.png)  
 
-## Further Advanced Considerations  
+## Further Advanced Considerations (Run the ExampleConfidenceIntervalSimulation console project)
 This article did not touch on the calibration of the model's confidence score nor the calibration of the model's probability LogProbs.
 Because LLMs are essentially neural networks, they can be uncalibrated for specific tasks or domains.
 Basically, when the LLM says it is 8/10 confident or probability of 80%, the model should be correct about 80% of the time (within the error rate).  
