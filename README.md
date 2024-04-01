@@ -68,8 +68,9 @@ Example Output:
    * The previous examples show a single point estimate of the confidence score. This can be misleading as the model may have multiple interpretations of the response.  
    * Azure OpenAI LogProbs can return a probability mass function (PMF) distribution of up to the next 5 tokens including their probabilities.  
    * This calculation uses multiple LogProbs to determine the "confidence interval" of the response.  
-   * The confidence interval is calculated by bootstrapping multiple calls (10) to the model and calculating the 95% confidence interval of the confidence scores.  
-   * The confidence interval can be used to understand the range of possibilities, where 95% of the outcomes will fall within this range as the same question is repeated.  
+   * The confidence interval is calculated by bootstrapping multiple calls (10) to the model (using the same prompt) and calculating the 95% confidence interval of the confidence scores.  
+   * The confidence interval can be used to understand the range of possibilities, where 95% of the outcomes will fall within this range as the same question is repeated.
+   * Why would you call the model 10x, isn't that overkill? For high-stakes decisions and reasoning (buying a house/car, deciding on a 4-year degree), those extra few calls are well worth the few cents and seconds to get a proper error range.
 
 Example Output:  
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/Images/ProcessOption-ConfidenceScoreInterval.png)  
@@ -77,11 +78,12 @@ Example Output:
 ## Further Advanced Considerations  
 This article did not touch on the calibration of the model's confidence score nor the calibration of the model's probability LogProbs.
 Because LLMs are essentially neural networks, they can be uncalibrated for specific tasks or domains.
-Basically, when the LLM says it is 8/10 confident or probability of 80%, the model should be correct 80% of the time.  
+Basically, when the LLM says it is 8/10 confident or probability of 80%, the model should be correct about 80% of the time (within the error rate).  
 
-  * A model that answered 100 questions with a confidence score of 80%, it should be correct 80 times. That would reflect perfect calibration.  
-  * A model that answered 100 questions with a confidence score of 80% and was only correct 50 times would be overconfident. Note: This is outside the expected error range.  
-  * A model that answered 100 questions with a confidence score of 80% and was correct 95 times would be underconfident. Note: This is outside the expected error range.  
+  * A model that answered 100 questions with a confidence score of 80%, it should be correct around 80 times. This would be ideal calibration.
+    * Note: There is an error rate even if the model is perfectly calibrated around 80%. In the case of 100 questions, 95% of the time we expect the range to be between 72 and 88 correct questions (+/- 8 questions around 80).
+  * A model that answered 100 questions with a confidence score of 80% and was only correct 50 times would be overconfident. Note: This is well outside the expected error range.  
+  * A model that answered 100 questions with a confidence score of 80% and was correct 95 times would be underconfident. Note: This is well outside the expected error range.  
 
   The topic of calibration is not new and has been studied in decision theory and machine learning.
   You can apply both decision intelligence (cognitive science) and machine learning techniques to further calibrate the model performance.
