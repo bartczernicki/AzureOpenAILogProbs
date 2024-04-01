@@ -64,7 +64,7 @@ Example Output:
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-ConfidenceScoreWeightedProbability.png)  
 
 <p align="left" width="100%">
-    Below is an example of a Token Probability Distribution when multiple LogProbs tokens are returned with their respective probabilities. In the histogram below, "Confidence Score: 1" has a 42.3% probability. If you just select that highest confidence score that the model returned, you could be missing a great deal of other information. In this scenario, there is another ~57% of information that can be used to calculate a "weighted" Confidence Score, which comes to ~2.3.<br>
+    Below is an example of a Token Probability Distribution when multiple LogProbs tokens are returned with their respective probabilities. In the histogram below, "Confidence Score: 1" has a 42.3% probability. If you just select that highest confidence score that the model returned, you could be missing a great deal of other information. In this scenario, there is another ~57% of information that can be used to calculate a "weighted" Confidence Score, which calibrates the Confidence Score from 1 -> ~2.3.<br>
     <img src="https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-TokenProbabilityDistributionExample.png" width="500"/>
 </p>
 
