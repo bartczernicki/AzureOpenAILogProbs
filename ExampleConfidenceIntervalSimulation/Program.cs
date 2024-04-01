@@ -47,8 +47,8 @@
             Console.WriteLine($"Maximum Amount of Questions Answered (assuming {CLAIMEDCONFIDENCEOFAIMODEL}% claimed confidence) in {NUMBEROFSIMULATIONS:n0} simulations: {bootstrapConfidenceScoresSorted.Last()}");
 
             // These percentiles will converge to the true confidence interval as the number of simulations increases
-            Console.WriteLine($"Lower 2.5% bound: {lowerPercentile}");
-            Console.WriteLine($"Upper 2.5% bound: {upperPercentile}");
+            Console.WriteLine($"Lower 2.5% question bound: {lowerPercentile}");
+            Console.WriteLine($"Upper 2.5% question bound: {upperPercentile}");
 
             Console.WriteLine($"%    Less than 50 Questions Answered Correctly: {(1.0 * lessThan50) / NUMBEROFSIMULATIONS}");
             Console.WriteLine($"% Greater than 90 Questions Answered Correctly: {(1.0 * greaterThan90) / NUMBEROFSIMULATIONS}");
