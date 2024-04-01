@@ -80,12 +80,14 @@ This article did not touch on the calibration of the model's confidence score no
 Because LLMs are essentially neural networks, they can be uncalibrated for specific tasks or domains.
 Basically, when the LLM says it is 8/10 confident or probability of 80%, the model should be correct about 80% of the time (within the error rate).  
 
-  * A model that answered 100 questions with a confidence score of 80%, it should be correct around 80 times. This would be ideal calibration.
+  * A model that answered 100 questions with a confidence score of 80% should be correct around 80 times. This would be ideal calibration.
     * Note: There is an error rate even if the model is perfectly calibrated around 80%. In the case of 100 questions, 95% of the time we expect the range to be between 72 and 88 correct questions (+/- 8 questions around 80).
-  * A model that answered 100 questions with a confidence score of 80% and was only correct 50 times would be overconfident. Note: This is well outside the expected error range.  
-  * A model that answered 100 questions with a confidence score of 80% and was correct 95 times would be underconfident. Note: This is well outside the expected error range.  
+  * A model that answered 100 questions with a confidence score of 80% and was only correct 50 times would be extremely overconfident. Note: This is well outside the expected error range.
+    * Note: If you simulate this millions of times, the probability of only getting only 50 correct answers if the model claims it is 80% confident is near 0.00%! Not impossible, but if this occurs in real testing the model is clearly uncalibrated and very overconfident.
+  * A model that answered 100 questions with a confidence score of 80% and was correct 90 times would be underconfident. Note: This is outside the expected error range.
+    * Note: Statistics or a simulation can demonstrate that a model that is 80% confident, but is actually correct 90 times would only occur 0.00233 (0.233%) of the time.
 
-  The topic of calibration is not new and has been studied in decision theory and machine learning.
-  You can apply both decision intelligence (cognitive science) and machine learning techniques to further calibrate the model performance.
+The topic of calibration is not new and has been studied in decision theory and machine learning.
+You can apply both decision intelligence (cognitive science) and machine learning techniques to further calibrate the model performance.
   * Calibrating Chat GPT for Its Overconfidence: https://hubbardresearch.com/chat-gpt-ai-calibration/  
   * Calibrating LLM-Based Evaluator: https://arxiv.org/pdf/2309.13308.pdf  
