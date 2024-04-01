@@ -37,7 +37,7 @@ This is illustrated below with the diagram:
 
 ## Console Processing Options  
 
-### 1) First Token Probability  
+### 1) First Token Probability - Calculate How Confident the Model is with the information to answer the Question  
    * Uses the Azure OpenAI LogProbs to determine the probability of the first token in the response.
    * If the probability is high, it is likely the model has enough information to answer the question.  
    * If the probability is low, it is likely the model does not have enough information to answer the question.  
@@ -46,7 +46,7 @@ This is illustrated below with the diagram:
 Example Output:
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-FirstTokenProbability.png)  
 
-### 2) Weighted Probability of Confidence Score  
+### 2) Weighted Probability of Confidence Score - Have the Model provide a self-confidence score and then assess the probability of that score
    * Azure OpenAI LogProbs can return a probability mass function (PMF) distribution of up to the next 5 tokens including their probabilities.  
    * This calculation uses multiple LogProbs to determine the "weighted" probability of the response.  
    * The weighted probability is calculated by multiplication: confidence score*probability to give a better weighted estimate of the confidence to answer the question.  
@@ -68,7 +68,7 @@ Example Output:
     <img src="https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-TokenProbabilityDistributionExample.png" width="500"/>
 </p>
 
-### 3) 95% Confidence Score Interval  
+### 3) 95% Confidence Score Interval - Use the distribution of probabilities to calculate a 95% Confidence Interval (range) of plausible answers
    * The previous examples show a single point estimate of the confidence score. This can be misleading as the model may have multiple interpretations of the response.  
    * Azure OpenAI LogProbs can return a probability mass function (PMF) distribution of up to the next 5 tokens including their probabilities.  
    * This calculation uses multiple LogProbs to determine the "confidence interval" of the response.  
