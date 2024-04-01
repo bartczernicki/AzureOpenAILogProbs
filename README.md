@@ -75,7 +75,7 @@ Example Output:
 Example Output:  
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-ConfidenceScoreInterval.png)  
 
-## Further Advanced Considerations  
+## Further Advanced Considerations (Run the ExampleConfidenceIntervalSimulation console project)
 This article did not touch on the calibration of the model's confidence score nor the calibration of the model's probability LogProbs.
 Because LLMs are essentially neural networks, they can be uncalibrated for specific tasks or domains.
 Basically, when the LLM says it is 8/10 confident or probability of 80%, the model should be correct about 80% of the time (within the error rate).  
@@ -86,6 +86,9 @@ Basically, when the LLM says it is 8/10 confident or probability of 80%, the mod
     * Note: If you simulate this millions of times, the probability of only getting only 50 correct answers if the model claims it is 80% confident is near 0.00%! Not impossible, but if this occurs in real testing the model is clearly uncalibrated and very overconfident.
   * A model that answered 100 questions with a confidence score of 80% and was correct 90 times would be underconfident. Note: This is outside the expected error range.
     * Note: Statistics or a simulation can demonstrate that a model that is 80% confident, but is actually correct 90 times would only occur 0.00233 (0.233%) of the time.
+
+Example Statistical Simulation:  
+![Simulation of 80% answers](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/ExampleConfidenceIntervalSimulation/Images/ExampleConfidenceIntervalSimulation-Console.png)  
 
 The topic of calibration is not new and has been studied in decision theory and machine learning.
 You can apply both decision intelligence (cognitive science) and machine learning techniques to further calibrate the model performance.
