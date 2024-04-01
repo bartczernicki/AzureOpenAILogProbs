@@ -32,7 +32,7 @@ This tremendous capability can empower the AI system to self-correct or guide th
 In the set of processing examples below, we will simulate a parallel call to the model to gauge the confidence.
 This is illustrated below with the diagram:  
 
-![Azure LogProbs Workflow](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/Images/AzureLogProbs-LogProbsWorkflow.png)  
+![Azure LogProbs Workflow](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-LogProbsWorkflow.png)  
 
 
 ## Console Processing Options  
