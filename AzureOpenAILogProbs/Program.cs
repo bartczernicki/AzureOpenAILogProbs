@@ -365,7 +365,7 @@ namespace AzureOpenAILogProbs
                     for (int i = 0; i != 1000; i++) // 1,000 Bootstrap Simulations (bootstrap estimates)
                     {
                         var bootstrapSample = new List<double>();
-                        for (int j = 0; j != 10; j++) // Keep the sample size at least 30, could be higher to reduce variance/error
+                        for (int j = 0; j != 10; j++) // Sample size should match the number of times the question was asked
                         {
                             var randomIndex = random.Next(0, weightedConfidenceScores.Count);
                             bootstrapSample.Add(weightedConfidenceScores[randomIndex]);
