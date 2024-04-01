@@ -87,6 +87,9 @@ Basically, when the LLM says it is 8/10 confident or probability of 80%, the mod
   * A model that answered 100 questions with a confidence score of 80% and was correct 90 times would be underconfident. Note: This is outside the expected error range.
     * Note: Statistics or a simulation can demonstrate that a model that is 80% confident, but is actually correct 90 times would only occur 0.00233 (0.233%) of the time.
 
+Example Statistical Simulation:  
+![Simulation of 80% answers](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/ExampleConfidenceIntervalSimulation/Images/ExampleConfidenceIntervalSimulation-Console.png)  
+
 The topic of calibration is not new and has been studied in decision theory and machine learning.
 You can apply both decision intelligence (cognitive science) and machine learning techniques to further calibrate the model performance.
   * Calibrating Chat GPT for Its Overconfidence: https://hubbardresearch.com/chat-gpt-ai-calibration/  
