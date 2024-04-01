@@ -63,14 +63,10 @@ chatCompletionOptionsConfidenceScore.LogProbabilitiesPerToken = 5;
 Example Output:  
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-ConfidenceScoreWeightedProbability.png)  
 
-<p align="center" width="100%">
-    Highly recommended book Innumeracy for basic statistical understanding<br>
-    <img src="https://m.media-amazon.com/images/W/WEBP_402378-T2/images/I/71MB0lkirGL.jpg" width="200"/>
+<p align="left" width="100%">
+    Example of a Probability Distribution when multiple LogProbs tokens are returned with their probabilities. This can be used to calculate a "weighted" Confidence Score: <br>
+    <img src="https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-TokenProbabilityDistributionExample.png" width="500"/>
 </p>
-
-Example of a Probability Distribution when multiple LogProbs tokens are returned with their probabilities. This can be used to calculate a "weighted" Confidence Score:  
-![Probability Distribution](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-TokenProbabilityDistributionExample.png)  
-
 
 ### 3) 95% Confidence Score Interval  
    * The previous examples show a single point estimate of the confidence score. This can be misleading as the model may have multiple interpretations of the response.  
