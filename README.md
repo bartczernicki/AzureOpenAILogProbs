@@ -4,7 +4,7 @@
      * Weighted Probability of Confidence Score - Self Confidence Score that is weighted from LogProbs probability (PMF) distribution to give a better (weighted) confidence score estimate to answer a question
      * Confidence Interval - Calculated from bootstrap simulation of multiple calls to the model. This provides a 95% confidence interval (range) of plausible confidence scores. This is ideal when you need to understand a range of possibilities the model interprets rather than a single point estimate.
 
-![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/Images/AzureLogProbsConsoleApp.png)
+![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbsConsoleApp.png)
 
 ## Get Started: Add this to the User Secrets (Right Click on VS Project -> Manage User Secrets)
 ```javascript
@@ -32,7 +32,7 @@ This tremendous capability can empower the AI system to self-correct or guide th
 In the set of processing examples below, we will simulate a parallel call to the model to gauge the confidence.
 This is illustrated below with the diagram:  
 
-![Azure LogProbs Workflow](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/Images/AzureLogProbs-LogProbsWorkflow.png)  
+![Azure LogProbs Workflow](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-LogProbsWorkflow.png)  
 
 
 ## Console Processing Options  
@@ -44,7 +44,7 @@ This is illustrated below with the diagram:
    * The probability can be used as a decision threshold for a binary classification of whether the model has enough information (RAG context) to answer the question.     
 
 Example Output:
-![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/Images/ProcessOption-FirstTokenProbability.png)  
+![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-FirstTokenProbability.png)  
 
 ### 2) Weighted Probability of Confidence Score  
    * Azure OpenAI LogProbs can return a probability mass function (PMF) distribution of up to the next 5 tokens including their probabilities.  
@@ -61,7 +61,7 @@ chatCompletionOptionsConfidenceScore.LogProbabilitiesPerToken = 5;
 ```  
 
 Example Output:  
-![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/Images/ProcessOption-ConfidenceScoreWeightedProbability.png)  
+![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-ConfidenceScoreWeightedProbability.png)  
 
 
 ### 3) 95% Confidence Score Interval  
@@ -73,7 +73,7 @@ Example Output:
    * Why would you call the model 10x, isn't that overkill? For high-stakes decisions and reasoning (buying a house/car, deciding on a 4-year degree), those extra few calls are well worth the few cents and seconds to get a proper error range.
 
 Example Output:  
-![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/Images/ProcessOption-ConfidenceScoreInterval.png)  
+![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-ConfidenceScoreInterval.png)  
 
 ## Further Advanced Considerations  
 This article did not touch on the calibration of the model's confidence score nor the calibration of the model's probability LogProbs.
