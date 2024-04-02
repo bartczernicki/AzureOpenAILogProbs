@@ -22,14 +22,14 @@ Recommended Reading on the background of Azure OpenAI LogProbs:
    * OpenAI Cookbook - LogProbs: https://cookbook.openai.com/examples/using_logprobs  
    * What are logprobs?: https://www.ignorance.ai/p/what-are-logprobs  
 
-These examples focus on reducing hallucinations and improving the reliability of the model's responses.
-There are many techniques that use multiple calls to a model or several models to arrive at a response, conclusion or a decision.
+The three examples illustrated focus on reducing hallucinations and improving the reliability of the model's responses when presented with grounding information and a question.
+There are several emerging techniques that use multiple calls to a model or several models to arrive at a response, conclusion or a decision.
 A plurality of ways LLMs are used in GenAI production systems is with grounding (RAG) with additional context.
 The model is asked to answer a question, reason over that information etc. However, with poor grounding, this can result in poor results.  
 
-The Azure OpenAI LogProbs can be used to gauge the confidence (probability) of the model's response.
+Azure OpenAI LogProbs are a tool that can help and be used to gauge the confidence (probability) of the model's response.
 This tremendous capability can empower the AI system to self-correct or guide the user/agent to arrive at a better response.
-In the set of processing examples below, we will simulate a parallel call to the model to gauge the confidence.
+In the set of examples below, we will simulate a parallel call to the model to gauge the confidence the model has with the presented context and question.
 This is illustrated below with the diagram:  
 
 ![Azure LogProbs Workflow](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-LogProbsWorkflow.png)  
@@ -37,7 +37,7 @@ This is illustrated below with the diagram:
 
 ## Console Processing Options  
 
-### 1) First Token Probability  
+### 1) First Token Probability - How Confident is the AI Model with the information to answer the question  
    * Uses the Azure OpenAI LogProbs to determine the probability of the first token in the response.
    * If the probability is high, it is likely the model has enough information to answer the question.  
    * If the probability is low, it is likely the model does not have enough information to answer the question.  
@@ -46,7 +46,7 @@ This is illustrated below with the diagram:
 Example Output:
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-FirstTokenProbability.png)  
 
-### 2) Weighted Probability of Confidence Score  
+### 2) Weighted Probability of Confidence Score - Model provides a self-confidence score and then assess the probability of the confidence score
    * Azure OpenAI LogProbs can return a probability mass function (PMF) distribution of up to the next 5 tokens including their probabilities.  
    * This calculation uses multiple LogProbs to determine the "weighted" probability of the response.  
    * The weighted probability is calculated by multiplication: confidence score*probability to give a better weighted estimate of the confidence to answer the question.  
@@ -63,8 +63,12 @@ chatCompletionOptionsConfidenceScore.LogProbabilitiesPerToken = 5;
 Example Output:  
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-ConfidenceScoreWeightedProbability.png)  
 
+<p align="left" width="100%">
+    Below is an example of a Token Probability Distribution when 5 LogProbs tokens are returned with their respective probabilities. In the histogram below, "Confidence Score: 1" has a 42.3% probability; which means the model thinks that is has a very low Confidence Score=1 of answering the question and that low chance is 42.3%. If you just select that highest confidence score that the model returned, you could be missing a great deal of other information with the other tokens (token number 2 - 5). In this scenario, there is another ~57% of information that other token probabilities can be used to calculate a "weighted" Confidence Score, which calibrates the Confidence Score from 1 -> 2.3.<br>
+    <img src="https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-TokenProbabilityDistributionExample.png" width="500"/>
+</p>
 
-### 3) 95% Confidence Score Interval  
+### 3) 95% Confidence Score Interval - Use the distribution of probabilities to calculate a 95% Confidence Interval (range) of plausible answers
    * The previous examples show a single point estimate of the confidence score. This can be misleading as the model may have multiple interpretations of the response.  
    * Azure OpenAI LogProbs can return a probability mass function (PMF) distribution of up to the next 5 tokens including their probabilities.  
    * This calculation uses multiple LogProbs to determine the "confidence interval" of the response.  
