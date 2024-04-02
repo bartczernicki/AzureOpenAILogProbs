@@ -18,6 +18,10 @@
 ```
 ## Background Information  
 
+What are LogProbs? Most current LLMs process prompt instructions by predicting the next token and iterate through each token until they reach a stopping point (i.e. max token length, completing the thought). Each next token that is considered for output is calculated through statistical probability distribution that are calulated from the logarithm of probabilities (logprobs). Based on configurations (tempature, top_p etc.) these probabilities can be calibrated and then the LLM selects the next "best token" based on the different settings. Because these LLMs are probabilistic in nature, this is why you may see different outputs for the same question to the LLM. Below is an example of a question and answer and the associated probabilities for the two tokens/words: "George Washington".
+
+![Azure LogProbs Example](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-Example.png)
+
 Recommended Reading on the background of Azure OpenAI LogProbs:  
    * OpenAI Cookbook - LogProbs: https://cookbook.openai.com/examples/using_logprobs  
    * What are logprobs?: https://www.ignorance.ai/p/what-are-logprobs  
