@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using Azure.Core;
 using MathNet.Numerics.Statistics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AzureOpenAILogProbs
 {
@@ -102,21 +103,22 @@ namespace AzureOpenAILogProbs
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine($"{sampleWikipediaArticle}\r\n");
 
-                // DEfine sample list of questions to ask the model
-                var questions = new List<string>
+                // Define sample list of questions to ask the model
+                // Note: The questions are a mix of True/False questions and highly dependent on the sample Wikipedia article above (Mets)
+                var questions = new List<Question>
                 {
-                "When where the Mets founded?", // expected: true
-                "Are the Mets a baseball team?", // expected: true
-                "Who owns the Mets?", // expected: true
-                "Have the Mets won the 2023 World Series?", // expected: false
-                "Who are the Boston Red Sox?", // expected: false
-                "Where the Mets were a bad team in the 1960s?", // expected: true
-                "Are the Mets uniform colors only blue and orange?", // expected: ?
-                "Are the there only 2 Mets uniform colors?", // expected: ?
-                "Do you think the Mets were a historically good team?", // expected: ?
-                "Did the Mets have a winning season in their first year of play?", // expected: ?
-                "Has Steve Cohen been the longest-serving owner of the Mets?", // expected: ?
-                "Is Citi Field located on the exact original site of Shea Stadium?" // expected: ?
+                new Question{ Number = 1, EnoughInformationInProvidedContext = true, QuestionText = "When where the Mets founded?" },
+                new Question{ Number = 2, EnoughInformationInProvidedContext = true, QuestionText = "Are the Mets a baseball team?" },
+                new Question{ Number = 3, EnoughInformationInProvidedContext = true, QuestionText = "Who owns the Mets?" },
+                new Question{ Number = 4, EnoughInformationInProvidedContext = false, QuestionText = "Have the Mets won the 2023 World Series?" },
+                new Question{ Number = 5, EnoughInformationInProvidedContext = false, QuestionText = "Who are the Boston Red Sox?" }, 
+                new Question{ Number = 6, EnoughInformationInProvidedContext = true, QuestionText = "Where the Mets were a bad team in the 1960s?" },
+                new Question{ Number = 7, EnoughInformationInProvidedContext = true, QuestionText = "Do the Mets uniforms include the colors blue and orange?" },
+                new Question{ Number = 8, EnoughInformationInProvidedContext = false, QuestionText = "Are the there only 2 colors onm the Mets uniform?" },
+                new Question{ Number = 9, EnoughInformationInProvidedContext = false, QuestionText = "Do you think the Mets were a historically very good team?" },
+                new Question{ Number = 10, EnoughInformationInProvidedContext = true, QuestionText = "Did the Mets have a winning season in their inaugural season of play?" },
+                new Question{ Number = 11, EnoughInformationInProvidedContext = false, QuestionText = "Has Steve Cohen been the longest-serving owner of the Mets?" },
+                new Question { Number = 12, EnoughInformationInProvidedContext = false, QuestionText = "Is Citi Field located on the exact original site of Shea Stadium?" }
                 };
 
                 // Process the selected option
@@ -131,7 +133,7 @@ namespace AzureOpenAILogProbs
                         -- END OF WIKIPEDIA ARTICLE--
                         The question is: 
                         -- START OF QUESTION--
-                        {question}
+                        {question.QuestionText}
                         -- END OF QUESTION--
                         INSTRUCTIONS: 
                         Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
@@ -160,12 +162,13 @@ namespace AzureOpenAILogProbs
                         // 1) Write the Question to the console
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine();
-                        Console.WriteLine(question);
+                        Console.WriteLine($"{question.Number}) {question.QuestionText}");
                         Console.ResetColor();
 
                         // 2) True/False Question - Raw answers to the console
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine($"[{responseMessageTrueFalse.Role.ToString().ToUpperInvariant()} - True/False]: {responseMessageTrueFalse.Content}");
+                        Console.WriteLine($"[Human Expected Answer (Enough Information) - True/False]: {question.EnoughInformationInProvidedContext}");
+                        Console.WriteLine($"[LLM {responseMessageTrueFalse.Role.ToString().ToUpperInvariant()} (Enough Information) - True/False]: {responseMessageTrueFalse.Content}");
 
                         // 3) True/False Question - Answer Details
                         // https://stackoverflow.com/questions/48465737/how-to-convert-log-probability-into-simple-probability-between-0-and-1-values-us
@@ -191,7 +194,7 @@ namespace AzureOpenAILogProbs
                         -- END OF WIKIPEDIA ARTICLE--
                         The question is: 
                         -- START OF QUESTION--
-                        {question}
+                        {question.QuestionText}
                         -- END OF QUESTION--
                         INSTRUCTIONS: Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
                         Your output should JUST be the a single confidence score between 1 to 10, if you have sufficient information in the Wikipedia article to answer the question.
@@ -222,12 +225,13 @@ namespace AzureOpenAILogProbs
                         // 1) Write the Question to the console
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine();
-                        Console.WriteLine(question);
+                        Console.WriteLine($"{question.Number}) {question.QuestionText}");
                         Console.ResetColor();
 
                         // 2) Confidence Score Question - Raw answers to the console
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine($"[{responseMessageConfidenceScore.Role.ToString().ToUpperInvariant()} - Confidence Score]: {responseMessageConfidenceScore.Content}");
+                        Console.WriteLine($"[Human Expected Answer (Enough Information) - True/False]: {question.EnoughInformationInProvidedContext}");
+                        Console.WriteLine($"[LLM {responseMessageConfidenceScore.Role.ToString().ToUpperInvariant()} (Enough Information) - Confidence Score]: {responseMessageConfidenceScore.Content}");
 
                         // 3) Confidence Score Question - Process the Confidence Score answer details
                         var logProbsConfidenceScore = responseConfidenceScore.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability of First Token (LLM Probability of Self-Confidence Score in having enough info for question): " + Math.Round(Math.Exp(a.LogProbability), 8));
