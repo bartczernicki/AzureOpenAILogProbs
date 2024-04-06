@@ -79,8 +79,9 @@ namespace AzureOpenAILogProbs
                     Console.WriteLine(string.Empty); 
                     Console.WriteLine("Select one of the options to run, by typing either 1 through 3:");
                     Console.WriteLine("1) First Token Probability - True or False, whether the model has enough info to answer question.");
-                    Console.WriteLine("2) Weighted Probability of Confidence Score - Self Confidence Score that is weighted from LogProbs PMF distribution.");
-                    Console.WriteLine("3) Confidence Interval - Calculated from bootstrap simulation of multiple calls to the model.");
+                    Console.WriteLine("2) First Token Probability - True or False, whether the model has enough info to answer question [With Brier Score].");
+                    Console.WriteLine("3) Weighted Probability of Confidence Score - Self Confidence Score that is weighted from LogProbs PMF distribution.");
+                    Console.WriteLine("4) Confidence Interval - Calculated from bootstrap simulation of multiple calls to the model.");
 
                     var insertedText = Console.ReadLine();
                     string trimmedInput = insertedText!.Trim();
@@ -122,8 +123,14 @@ namespace AzureOpenAILogProbs
                 };
 
                 // Process the selected option
-                if (selectedProcessingChoice == (ProcessingOptions.FirstTokenProbability))
+                if  (
+                    (selectedProcessingChoice == (ProcessingOptions.FirstTokenProbability)) ||
+                    (selectedProcessingChoice == (ProcessingOptions.FirstTokenProbabilityWithBrierScore))
+                    )
                 {
+                    // Track the list of answers
+                    var questionAnswers = new List<QuestionAnswer>();
+
                     foreach (var question in questions)
                     {
                         var promptInstructionsTrueFalse = $"""
@@ -173,12 +180,36 @@ namespace AzureOpenAILogProbs
                         // 3) True/False Question - Answer Details
                         // https://stackoverflow.com/questions/48465737/how-to-convert-log-probability-into-simple-probability-between-0-and-1-values-us
                         var logProbsTrueFalse = responseTrueFalse.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability of First Token (LLM Probability of having enough info for question): " + Math.Round(Math.Exp(a.LogProbability), 8));
+                        var probability = Math.Round(Math.Exp(responseTrueFalse.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults[0].LogProbability), 8);
                         // Write out the first token probability
                         foreach (var logProb in logProbsTrueFalse)
                         {
                             Console.WriteLine($"True/False Answer: {logProb}");
                         }
+
+                        // convert responseMessageTrueFalse.Content to bool
+                        var responseTrueFalseBool = responseMessageTrueFalse.Content == "True";
+                        if (selectedProcessingChoice == ProcessingOptions.FirstTokenProbabilityWithBrierScore)
+                        {
+                            questionAnswers.Add(new QuestionAnswer
+                            {
+                                Number = question.Number,
+                                Answer = bool.Parse(responseMessageTrueFalse.Content),
+                                DoesAnswerMatchExpectedAnswer = (bool.Parse(responseMessageTrueFalse.Content) == question.EnoughInformationInProvidedContext),
+                                AnswerProbability = probability
+                            });
+                        }
                     } // end of foreach question loop
+
+                    if (selectedProcessingChoice == ProcessingOptions.FirstTokenProbabilityWithBrierScore)
+                    {
+                        // Calculate the Brier Score for the answers
+                        var brierScore = questionAnswers.Select(a => a.BrierScore).Average();
+                        Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"Average Brier Score for the answers: {Math.Round(brierScore, 5)}");
+                        Console.ResetColor();
+                    }
                 }
                 else if (selectedProcessingChoice == ProcessingOptions.WeightedProbability)
                 {

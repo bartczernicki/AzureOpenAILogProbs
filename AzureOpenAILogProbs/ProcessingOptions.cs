@@ -10,7 +10,8 @@ namespace AzureOpenAILogProbs
     {
         None = 0,
         FirstTokenProbability = 1,
-        WeightedProbability = 2,
-        ConfidenceInterval = 3
+        FirstTokenProbabilityWithBrierScore = 2,
+        WeightedProbability = 3,
+        ConfidenceInterval = 4
     }
 }
