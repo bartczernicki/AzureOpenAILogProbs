@@ -1,3 +1,5 @@
+![Azure OpenAI LogProbs Title](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-Title.png)
+
 ## Azure OpenAI LogProbs Examples  
    * .NET Console application that shows examples how Azure OpenAI Log Probs that can be useful for RAG implementations:
      * Calculate First Token Probability - True or False probability, determine whether the (LLM) model has enough info to answer question  
