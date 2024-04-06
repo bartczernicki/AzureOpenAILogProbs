@@ -5,6 +5,7 @@ using System;
 using Azure.Core;
 using MathNet.Numerics.Statistics;
 using System.Diagnostics.CodeAnalysis;
+using ConsoleTables;
 
 namespace AzureOpenAILogProbs
 {
@@ -86,7 +87,7 @@ namespace AzureOpenAILogProbs
                     var insertedText = Console.ReadLine();
                     string trimmedInput = insertedText!.Trim();
 
-                    if (trimmedInput == "1" || trimmedInput == "2" || trimmedInput == "3")
+                    if (trimmedInput == "1" || trimmedInput == "2" || trimmedInput == "3" || trimmedInput == "4")
                     {
                         validInput = true;
                         selectedProcessingChoice = (ProcessingOptions)Int32.Parse(trimmedInput);
@@ -195,6 +196,7 @@ namespace AzureOpenAILogProbs
                             {
                                 Number = question.Number,
                                 Answer = bool.Parse(responseMessageTrueFalse.Content),
+                                ExpectedAnswer = question.EnoughInformationInProvidedContext,
                                 DoesAnswerMatchExpectedAnswer = (bool.Parse(responseMessageTrueFalse.Content) == question.EnoughInformationInProvidedContext),
                                 AnswerProbability = probability
                             });
@@ -203,11 +205,15 @@ namespace AzureOpenAILogProbs
 
                     if (selectedProcessingChoice == ProcessingOptions.FirstTokenProbabilityWithBrierScore)
                     {
-                        // Calculate the Brier Score for the answers
-                        var brierScore = questionAnswers.Select(a => a.BrierScore).Average();
-                        Console.WriteLine();
+                        // Show the Brier Score for the answers in a table
                         Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"Average Brier Score for the answers: {Math.Round(brierScore, 5)}");
+                        var consoleTable = ConsoleTable.From<QuestionAnswer>(questionAnswers);
+                        consoleTable.Options.EnableCount = false;
+                        Console.WriteLine();
+                        Console.WriteLine("|CALCULATED BRIER SCORES");
+                        Console.WriteLine("|-----------------------");
+                        consoleTable.Write(Format.Minimal);
+                        Console.WriteLine($" Average Brier Score for sample questions: {Math.Round(questionAnswers.Select(a => a.BrierScore).Average(), 6)}");
                         Console.ResetColor();
                     }
                 }
