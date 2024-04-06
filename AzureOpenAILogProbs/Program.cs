@@ -80,7 +80,7 @@ namespace AzureOpenAILogProbs
                     Console.WriteLine(string.Empty); 
                     Console.WriteLine("Select one of the options to run, by typing either 1 through 3:");
                     Console.WriteLine("1) First Token Probability - True or False, whether the model has enough info to answer question.");
-                    Console.WriteLine("2) First Token Probability - True or False, whether the model has enough info to answer question [With Brier Score].");
+                    Console.WriteLine("2) First Token Probability - True or False, whether the model has enough info to answer question [With Brier Scores].");
                     Console.WriteLine("3) Weighted Probability of Confidence Score - Self Confidence Score that is weighted from LogProbs PMF distribution.");
                     Console.WriteLine("4) Confidence Interval - Calculated from bootstrap simulation of multiple calls to the model.");
 

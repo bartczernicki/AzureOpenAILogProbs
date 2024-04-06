@@ -3,6 +3,7 @@
 ## Azure OpenAI LogProbs Examples  
    * .NET Console application that shows examples how Azure OpenAI Log Probs that can be useful for RAG implementations:
      * Calculate First Token Probability - True or False probability, determine whether the (LLM) model has enough info to answer question  
+     * Calculate First Token Probability - True or False probability, determine whether the (LLM) model has enough info to answer question [With Brier Scores]  
      * Weighted Probability of Confidence Score - Self Confidence Score that is weighted from LogProbs probability (PMF) distribution to give a better (weighted) confidence score estimate to answer a question
      * Confidence Interval - Calculated from bootstrap simulation of multiple calls to the model. This provides a 95% confidence interval (range) of plausible confidence scores. This is ideal when you need to understand a range of possibilities the model interprets rather than a single point estimate.
 
@@ -28,7 +29,7 @@ Recommended Reading on the background of Azure OpenAI LogProbs:
    * OpenAI Cookbook - LogProbs: https://cookbook.openai.com/examples/using_logprobs  
    * What are logprobs?: https://www.ignorance.ai/p/what-are-logprobs  
 
-The three examples illustrated focus on reducing hallucinations and improving the reliability of the model's responses when presented with grounding information and a question.
+The four examples illustrated focus on reducing hallucinations and improving the reliability of the model's responses when presented with grounding information and a question.
 There are several emerging techniques that use multiple calls to a model or several models to arrive at a response, conclusion or a decision.
 A plurality of ways LLMs are used in GenAI production systems is with grounding (RAG) with additional context.
 The model is asked to answer a question, reason over that information etc. However, with poor grounding, this can result in poor results.  
@@ -50,9 +51,22 @@ This is illustrated below with the diagram:
    * The probability can be used as a decision threshold for a binary classification of whether the model has enough information (RAG context) to answer the question.     
 
 Example Output:
-![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-FirstTokenProbability.png)  
+![Azure OpenAI Log Probs - First Token Prob](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-FirstTokenProbability.png)  
 
-### 2) Weighted Probability of Confidence Score - Model provides a self-confidence score and then assess the probability of the confidence score
+
+### 2) First Token Probability - Calculating Brier Scores of the First Token Probability
+    * This example shows how to measure the predictive accuracy of the model.
+    * Sames as the First Token Probability, but also calculates the Brier Score for each of the probability answers.
+    * Brier scores (and similar methods in Machine Learning & Statistics) are used to measure the accuracy of probabilistic predictions.
+    * The lowethe Brier Score, the better the model is at predicting the probability of the answer response.
+    * It outputs a table of the Brier Scores for each of the questions and the average Brier Score for all the questions.
+    * Generally, average Brier Scores of 0.1 or lower are excellent, 0.1-0.2 are superior, 0.2-0.3 are adequate, and 0.2-0.35 are acceptable, and above 0.35 are poor.
+
+Example Output:
+![Azure OpenAI Log Probs - Calculated Brier Scores](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores.png)  
+
+
+### 3) Weighted Probability of Confidence Score - Model provides a self-confidence score and then assess the probability of the confidence score
    * Azure OpenAI LogProbs can return a probability mass function (PMF) distribution of up to the next 5 tokens including their probabilities.  
    * This calculation uses multiple LogProbs to determine the "weighted" probability of the response.  
    * The weighted probability is calculated by multiplication: confidence score*probability to give a better weighted estimate of the confidence to answer the question.  
@@ -74,7 +88,7 @@ Example Output:
     <img src="https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-TokenProbabilityDistributionExample.png" width="500"/>
 </p>
 
-### 3) 95% Confidence Score Interval - Use the distribution of probabilities to calculate a 95% Confidence Interval (range) of plausible answers
+### 4) 95% Confidence Score Interval - Use the distribution of probabilities to calculate a 95% Confidence Interval (range) of plausible answers
    * The previous examples show a single point estimate of the confidence score. This can be misleading as the model may have multiple interpretations of the response.  
    * Azure OpenAI LogProbs can return a probability mass function (PMF) distribution of up to the next 5 tokens including their probabilities.  
    * This calculation uses multiple LogProbs to determine the "confidence interval" of the response.  
