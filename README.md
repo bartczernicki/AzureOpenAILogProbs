@@ -29,7 +29,7 @@ Recommended Reading on the background of Azure OpenAI LogProbs:
    * OpenAI Cookbook - LogProbs: https://cookbook.openai.com/examples/using_logprobs  
    * What are logprobs?: https://www.ignorance.ai/p/what-are-logprobs  
 
-The four examples illustrated focus on reducing hallucinations and improving the reliability of the model's responses when presented with grounding information and a question. There are several emerging techniques that use multiple calls to a model or several models to arrive at a response, conclusion or a decision. A plurality of ways LLMs are used in GenAI production systems is with grounding (RAG) with additional context. The model is asked to answer a question, reason over that information etc. However, with poor grounding, this can result in poor results.  
+The four examples illustrated focus on reducing hallucinations and improving the reliability of the model's responses when presented with grounding information and a question. There are several emerging techniques that use multiple calls to a model or several models to arrive at a response, conclusion or a decision. Currently, most ways LLMs are used in GenAI production systems is with grounding (RAG) by providing additional contextual information. The model is asked to answer a question, reason over that information etc. However, with poor grounding, this can result in poor results.  
 
 Azure OpenAI LogProbs are a tool that can help and be used to gauge the confidence (probability) of the model's response.
 This tremendous capability can empower the AI system to self-correct or guide the user/agent to arrive at a better response.
