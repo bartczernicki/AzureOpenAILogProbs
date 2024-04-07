@@ -55,9 +55,9 @@ Example Output:
    * This example shows how to measure the predictive accuracy of the model.
    * Sames as the First Token Probability, but also calculates the Brier Score for each of the probability answers.
    * Brier scores (and similar methods in Machine Learning & Statistics) are used to measure the accuracy of probabilistic predictions.
-   * The lowethe Brier Score, the better the model is at predicting the probability of the answer response.
+   * The lower the Brier Score, the better the model is at predicting the probability of the answer response.
    * It outputs a table of the Brier Scores for each of the questions and the average Brier Score for all the questions.
-   * Generally, average Brier Scores of 0.1 or lower are excellent, 0.1-0.2 are superior, 0.2-0.3 are adequate, and 0.2-0.35 are acceptable, and above 0.35 are poor.
+   * Averaging Brier scores can tell us a great deal about the overall performance accuracy of the model. Average Brier Scores of 0.1 or lower are excellent, 0.1-0.2 are superior, 0.2-0.3 are adequate, and 0.2-0.35 are acceptable, and finally average Brier scores above 0.35 illustrate the overall model performance is poor.
 
 Example Output:
 ![Azure OpenAI Log Probs - Calculated Brier Scores](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores.png)  
