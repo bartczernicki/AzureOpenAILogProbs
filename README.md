@@ -9,7 +9,7 @@
 
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbsConsoleApp.png)
 
-## Get Started: Add this to the User Secrets (Right Click on VS Project -> Manage User Secrets)
+## Get Started: Clone the repo. Add this to the User Secrets (Right Click on VS Project -> Manage User Secrets) and run the console application.  
 ```javascript
 {
   "AzureOpenAI": {
@@ -21,7 +21,7 @@
 ```
 ## Background Information  
 
-What are LogProbs? Most current LLMs process prompt instructions by predicting the next token and iterate through each token until they reach a stopping point (i.e. max token length, completing the thought). Each next token that is considered for output is calculated through statistical probability distribution that are calulated from the logarithm of probabilities (logprobs). Based on configurations (tempature, top_p etc.) these probabilities can be calibrated and then the LLM selects the next "best token" based on the different configurations. Because these LLMs are probabilistic in nature, this is why you may see different outputs for the same question to the LLM. Below is an example of a question and answer and the associated probabilities for the two tokens/words and the ones that were selected: "George Washington".
+What are LogProbs? Most current LLMs process prompt instructions by predicting the next token and iterate through each token until they reach a stopping point (i.e. max token length, completing the thought). Each next token that is considered for output is calculated through statistical probability distribution. These probabilities are calulated from the logarithm of probabilities (logprobs). Based on configurations (tempature, top_p etc.) these probabilities can be set and then the LLM selects the next "best token" based on the different configurations. Because these LLMs are probabilistic in nature, this is why you may see different outputs for the same question to the LLM. Below is an example of a question and answer and the associated probabilities for the two tokens/words and the ones that were selected to answer the question: "George Washington".
 
 ![Azure LogProbs Example](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-Example.png)
 
