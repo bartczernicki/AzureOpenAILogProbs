@@ -1,7 +1,7 @@
 ![Azure OpenAI LogProbs Title](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-Title.png)
 
 ## Azure OpenAI LogProbs Examples  
-   * .NET Console application that shows examples how Azure OpenAI Log Probs that can be useful for RAG implementations:
+   * .NET Console application that shows examples how Azure OpenAI LogProbs that can be useful for RAG implementations:
      * Calculate First Token Probability - True or False probability, determine whether the (LLM) model has enough info to answer question  
      * Calculate First Token Probability - True or False probability, determine whether the (LLM) model has enough info to answer question [With Brier Scores]  
      * Weighted Probability of Confidence Score - Self Confidence Score that is weighted from LogProbs probability (PMF) distribution to give a better (weighted) confidence score estimate to answer a question
@@ -21,7 +21,7 @@
 ```
 ## Background Information  
 
-What are LogProbs? Most current LLMs process prompt instructions by predicting the next token and iterate through each token until they reach a stopping point (i.e. max token length, completing the thought). Each next token that is considered for output is calculated through statistical probability distribution. These probabilities are calulated from the logarithm of probabilities (logprobs). Based on configurations (tempature, top_p etc.) these probabilities can be set and then the LLM selects the next "best token" based on the different configurations. Because these LLMs are probabilistic in nature, this is why you may see different outputs for the same question to the LLM. Below is an example of a question and answer and the associated probabilities for the two tokens/words and the ones that were selected to answer the question: "George Washington".
+What are LogProbs? Most current LLMs process prompt instructions by predicting the next token and iterate through each token until they reach a stopping point (i.e. max token length, completing the thought). Each next token that is considered for output is calculated through statistical probability distribution. These probabilities are calulated from the logarithm of probabilities (logprobs). Based on configurations (tempature, top_p etc.) these probabilities can be set and then the LLM selects the next "best token" based on the different configurations. Because these LLMs are probabilistic in nature, this is why you may see different outputs for the same question to the LLM. Below is an example of a question and answer and the associated probabilities for the two tokens (words) and the tokens that were selected to answer the question: "George Washington".
 
 ![Azure LogProbs Example](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-Example.png)
 
@@ -29,7 +29,7 @@ Recommended Reading on the background of Azure OpenAI LogProbs:
    * OpenAI Cookbook - LogProbs: https://cookbook.openai.com/examples/using_logprobs  
    * What are logprobs?: https://www.ignorance.ai/p/what-are-logprobs  
 
-The four examples illustrated focus on reducing hallucinations and improving the reliability of the model's responses when presented with grounding information and a question. There are several emerging techniques that use multiple calls to a model or several models to arrive at a response, conclusion or a decision. Currently, most ways LLMs are used in GenAI production systems is with grounding (RAG) by providing additional contextual information. The model is asked to answer a question, reason over that information etc. However, with poor grounding, this can result in poor results.  
+There are several emerging techniques that use multiple calls to a model or several models to arrive at a response, conclusion or a decision. Currently, most ways LLMs are used in GenAI production systems is with grounding (RAG) by providing additional contextual information. The model is asked to answer a question, reason over that information etc. However, with poor grounding, this can result in poor results.  
 
 Azure OpenAI LogProbs are a tool that can help and be used to gauge the confidence (probability) of the model's response.
 This tremendous capability can empower the AI system to self-correct or guide the user/agent to arrive at a better response.
@@ -59,9 +59,9 @@ Example Output:
    * It outputs a table of the Brier Scores for each of the questions and the average Brier Score for all the questions.
    * Averaging Brier scores can tell us a great deal about the overall performance accuracy of the model. Average Brier Scores of 0.1 or lower are excellent, 0.1-0.2 are superior, 0.2-0.3 are adequate, and 0.2-0.35 are acceptable, and finally average Brier scores above 0.35 illustrate the overall model performance is poor.
 
-Brier scores will vary depending on the model capabilities, the prompt, and the context of the question. Keeping the prompt and context the same, one can compare model accuracy performance.
-Note the Brier scores below comparing GPT-4 and GPT-35 (Turbo) models. The GPT-4-0125 model has a lower Brier score, which means it is more accurate in predicting the probability of the answer response.
-In fact, the GPT-4-0125 correctly arrived at the final answer 100% of the time, whereas the GPT-35 (Turbo) model only matched the expected answer (if there is enough info in the context to answer the question) ~50% of the time.  
+Brier scores will vary depending on the model capabilities, the prompt, and the context of the question. Keeping the prompt and context the same, one can compare overall model accuracy performance.
+Note the Brier scores below comparing GPT-4 and GPT-35 (Turbo) models. The GPT-4-0125 model has a lower Brier score, which means it is more accurate in predicting the probability of the correct answer response.
+In fact, the GPT-4-0125 correctly arrived at the final answer 100% of the time, whereas the GPT-35 (Turbo) model only matched the expected answer (if there is enough info in the context to answer the question) ~75% of the time.  
 
 Example Output:
 ![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-4](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT4-0125Preview.png)  
@@ -76,7 +76,7 @@ Example Output:
    * The weighted probability is calculated by multiplication: confidence score*probability to give a better weighted estimate of the confidence to answer the question.  
    * The weighted probability can be used as a better calibrated confidence score for the model's response.  
 
-Note you have to enable LogProbs and set the LogProbabilitiesPerToken to 5 (current maximum, as of this writing):  
+Note you have to enable LogProbs and set the LogProbabilitiesPerToken to 5 (current Azure OpenAI maximum, as of this writing):  
 ```chsarp
 chatCompletionOptionsConfidenceScore.Temperature = 0.0f;
 chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
@@ -104,12 +104,12 @@ Example Output:
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-ConfidenceScoreInterval.png)  
 
 ## Further Advanced Considerations (Run the ExampleConfidenceIntervalSimulation console project)
-This article did not touch on the calibration of the model's confidence score nor the calibration of the model's probability LogProbs.
+This repo did not touch on the calibration of the model's confidence score nor the calibration of the model's probability LogProbs.
 Because LLMs are essentially neural networks, they can be uncalibrated for specific tasks or domains.
-Basically, when the LLM says it is 8/10 confident or probability of 80%, the model should be correct about 80% of the time (within the error rate).  
+Basically, when the LLM says it is 8/10 confident or determine a probability of 80%, the model should be correct about 80% of the time (within the error rate).  
 
   * A model that answered 100 questions with a confidence score of 80% should be correct around 80 times. This would be ideal calibration.
-    * Note: There is an error rate even if the model is perfectly calibrated around 80%. In the case of 100 questions, 95% of the time we expect the range to be between 72 and 88 correct questions (+/- 8 questions around the expected average of 80). Why report a 95% Confidence Level and not 100%? Reporting a 100% confidence level makes no sense as the 100% confidence range is from 0 - 100 correct answers. Even though the entire range of probabiliities is infeasable, there is still a very miniscule chance of answering 0 or 100 questions.
+      * Note: There is an error rate even if the model is perfectly calibrated around 80%. In the case of 100 questions, 95% of the time we expect the range to be between 72 and 88 correct questions (+/- 8 questions around the expected average of 80). Why report a 95% Confidence Level and not 100%? Reporting a 100% confidence level makes no sense as the 100% confidence range is from 0 - 100 correct answers. Even though the entire range of probabiliities is infeasable, there is still a very miniscule chance of answering 0 or 100 questions. A 95% confidence level provides a realistic range of plausible results and if you see results outside of this range, something "worth investigating" is potentially happening.
   * A model that answered 100 questions with a confidence score of 80% and was only correct 50 times would be extremely overconfident. This is well outside the expected error range.
     * Note: Statistics or a simulation can demonstrate the probability of only getting only 50 correct answers if the model claims it is 80% confident is near 0.00%! Not impossible, but if this occurs in a production scenario the model is clearly uncalibrated and very overconfident.  
   * A model that answered 100 questions with a confidence score of 80% and was correct 90 times would be underconfident. This is outside the expected error range.  
