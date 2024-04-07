@@ -45,7 +45,7 @@ This is illustrated below with the diagram:
    * Uses the Azure OpenAI LogProbs to determine the probability of the first token in the response.
    * If the probability is high, it is likely the model has enough information to answer the question.  
    * If the probability is low, it is likely the model does not have enough information to answer the question.  
-   * The probability can be used as a decision threshold for a binary classification of whether the model has enough information (RAG context) to answer the question.     
+   * The probability can be used as a decision threshold for a classification of whether the model has enough information (RAG context) to answer the question.     
 
 Example Output:
 ![Azure OpenAI Log Probs - First Token Prob](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-FirstTokenProbability.png)  
