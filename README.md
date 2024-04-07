@@ -62,8 +62,15 @@ Example Output:
    * It outputs a table of the Brier Scores for each of the questions and the average Brier Score for all the questions.
    * Generally, average Brier Scores of 0.1 or lower are excellent, 0.1-0.2 are superior, 0.2-0.3 are adequate, and 0.2-0.35 are acceptable, and above 0.35 are poor.
 
+Brier scores will vary depending on the model capabilities, the prompt, and the context of the question. Keeping the prompt and context the same, one can compare model accuracy performance.
+Note the Brier scores below comparing GPT-4 and GPT-35 (Turbo) models. The GPT-4-0125 model has a lower Brier score, which means it is more accurate in predicting the probability of the answer response.
+In fact, the GPT-4-0125 correctly arrived at the final answer 100% of the time, whereas the GPT-35 (Turbo) model only matched the expected answer (if there is enough info in the context to answer the question) ~50% of the time.  
+
 Example Output:
-![Azure OpenAI Log Probs - Calculated Brier Scores](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores.png)  
+![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-4](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT4-0125Preview.png)  
+
+![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-35](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT35-Turbo16k.png)  
+
 
 
 ### 3) Weighted Probability of Confidence Score - Model provides a self-confidence score and then assess the probability of the confidence score

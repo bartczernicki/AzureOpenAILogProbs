@@ -1,11 +1,9 @@
-﻿using Azure.AI.OpenAI;
-using Azure;
-using Microsoft.Extensions.Configuration;
-using System;
+﻿using Azure;
+using Azure.AI.OpenAI;
 using Azure.Core;
-using MathNet.Numerics.Statistics;
-using System.Diagnostics.CodeAnalysis;
 using ConsoleTables;
+using MathNet.Numerics.Statistics;
+using Microsoft.Extensions.Configuration;
 
 namespace AzureOpenAILogProbs
 {
@@ -210,8 +208,8 @@ namespace AzureOpenAILogProbs
                         var consoleTable = ConsoleTable.From<QuestionAnswer>(questionAnswers);
                         consoleTable.Options.EnableCount = false;
                         Console.WriteLine();
-                        Console.WriteLine("|CALCULATED BRIER SCORES");
-                        Console.WriteLine("|-----------------------");
+                        Console.WriteLine($"| CALCULATED BRIER SCORES FOR: {modelDeploymentName!.ToUpper()}");
+                        Console.WriteLine($"|-----------------------------");
                         consoleTable.Write(Format.Minimal);
                         Console.WriteLine($" Average Brier Score for sample questions: {Math.Round(questionAnswers.Select(a => a.BrierScore).Average(), 6)}");
                         Console.ResetColor();
