@@ -116,7 +116,7 @@ Basically, when the LLM says it is 8/10 confident or determine a probability of 
     * Note: Statistics or a simulation can demonstrate that a model that is 80% confident, but is actually correct more than 90 times would only occur 0.00233 (0.233%) of the time.
 
 Example Calibration in a real forecasting environment from Manifold Markets of thousands of forecasts:
-![Manifold Markets Calibration](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/ExampleConfidenceIntervalSimulation/Images/ExampleConfidenceIntervalSimulation-Console.png)  
+![Manifold Markets Calibration](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/ExampleConfidenceIntervalSimulation/Images/ManifoldMarketsCalibration.png)  
 
 Statistical Simulation Showing 10,000,000 simulations and the expected ranges for 100 questions 80% calibration:    
 ![Simulation of 80% answers](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/ExampleConfidenceIntervalSimulation/Images/ManifoldMarketsCalibration.png)  
