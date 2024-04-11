@@ -115,10 +115,14 @@ Basically, when the LLM says it is 8/10 confident or determine a probability of 
   * A model that answered 100 questions with a confidence score of 80% and was correct 90 times would be underconfident. This is outside the expected error range.  
     * Note: Statistics or a simulation can demonstrate that a model that is 80% confident, but is actually correct more than 90 times would only occur 0.00233 (0.233%) of the time.
 
-Example Statistical Simulation:  
-![Simulation of 80% answers](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/ExampleConfidenceIntervalSimulation/Images/ExampleConfidenceIntervalSimulation-Console.png)  
+Example Calibration in a real forecasting environment from Manifold Markets of thousands of forecasts:
+![Manifold Markets Calibration](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/ExampleConfidenceIntervalSimulation/Images/ExampleConfidenceIntervalSimulation-Console.png)  
+
+Statistical Simulation Showing 10,000,000 simulations and the expected ranges for 100 questions 80% calibration:    
+![Simulation of 80% answers](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/ExampleConfidenceIntervalSimulation/Images/ManifoldMarketsCalibration.png)  
 
 The topic of calibration is not new and has been studied in decision theory and machine learning.
 You can apply both decision intelligence (cognitive science) and machine learning techniques to further calibrate the model performance.
   * Calibrating Chat GPT for Its Overconfidence: https://hubbardresearch.com/chat-gpt-ai-calibration/  
+  * Example of forecasters Manifold Markets calibration: https://manifold.markets/calibration  
   * Calibrating LLM-Based Evaluator: https://arxiv.org/pdf/2309.13308.pdf  
