@@ -47,6 +47,8 @@ namespace AzureOpenAILogProbs
                 OpenAIClientOptions openAIClientOptions = new OpenAIClientOptions { Retry = { Delay = TimeSpan.FromSeconds(2), MaxDelay = TimeSpan.FromSeconds(30), MaxRetries = 5, Mode = RetryMode.Exponential } };
                 Uri azureOpenAIResourceUri = new(azureOpenAIEndpoint!);
                 AzureKeyCredential azureOpenAIApiKey = new(azureOpenAIAPIKey!);
+
+                // Info: https://github.com/Azure/azure-sdk-for-net/tree/Azure.AI.OpenAI_1.0.0-beta.16/sdk/openai/Azure.AI.OpenAI 
                 OpenAIClient client = new(azureOpenAIResourceUri, azureOpenAIApiKey, openAIClientOptions);
 
                 var modelDeploymentName = azureModelDeploymentName;
