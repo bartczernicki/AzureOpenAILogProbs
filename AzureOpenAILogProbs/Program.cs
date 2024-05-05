@@ -331,7 +331,8 @@ namespace AzureOpenAILogProbs
                             }
                     };
 
-                    chatCompletionOptionsConfidenceScore.Temperature = 0.0f;
+                    // Set this to a typical Temperature setting
+                    chatCompletionOptionsConfidenceScore.Temperature = 0.7f;
                     chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
                     // For the Confidence Score, we want to see 5 of the top log probabilities (PMF)
                     chatCompletionOptionsConfidenceScore.LogProbabilitiesPerToken = 5;

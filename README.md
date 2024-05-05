@@ -53,20 +53,20 @@ Example Output:
 
 ### 2) First Token Probability - Calculating Brier Scores of the First Token Probability
    * This example shows how to measure the predictive accuracy of the model.
-   * Sames as the First Token Probability, but also calculates the Brier Score for each of the probability answers.
+   * Same as the First Token Probability, but also calculates the Brier Score for each of the probability answers.
    * Brier scores (and similar methods in Machine Learning & Statistics) are used to measure the accuracy of probabilistic predictions.
    * The lower the Brier Score, the better the model is at predicting the probability of the answer response.
    * It outputs a table of the Brier Scores for each of the questions and the average Brier Score for all the questions.
    * Averaging Brier scores can tell us a great deal about the overall performance accuracy of the model. Average Brier Scores of 0.1 or lower are excellent, 0.1-0.2 are superior, 0.2-0.3 are adequate, and 0.2-0.35 are acceptable, and finally average Brier scores above 0.35 illustrate the overall model performance is poor.
 
 Brier scores will vary depending on the model capabilities, the prompt, and the context of the question. Keeping the prompt and context the same, one can compare overall model accuracy performance.
-Note the Brier scores below comparing GPT-4 and GPT-35 (Turbo) models. The GPT-4-0125 model has a lower Brier score, which means it is more accurate in predicting the probability of the correct answer response.
-In fact, the GPT-4-0125 correctly arrived at the final answer 100% of the time, whereas the GPT-35 (Turbo) model only matched the expected answer (if there is enough info in the context to answer the question) ~75% of the time.  
+Note the Brier scores below comparing GPT-4 and GPT-35 (Turbo) models. The GPT-4-20240409 model has a lower Brier score, which means it is more accurate in predicting the probability of the correct answer response.
+In fact, the GPT-4-20240409 correctly arrived at the final answer correctly 11 of the 12 times, whereas the GPT-35 (Turbo) model only matched the expected answer (if there is enough info in the context to answer the question) 10 of 12 times.  
 
 Example Output:
-![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-4](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT4-0125Preview.png)  
+![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-4](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT4-Turbo-20240409.png)  
 
-![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-35](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT35-Turbo16k.png)  
+![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-35](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT35-Turbo-0125.png)  
 
 
 
