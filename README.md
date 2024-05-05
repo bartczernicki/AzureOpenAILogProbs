@@ -21,15 +21,15 @@
 ```
 ## Background Information  
 
-What are LogProbs? Most current LLMs process prompt instructions by predicting the next token and iterate through each token until they reach a stopping point (i.e. max token length, completing the thought). Each next token that is considered for output is calculated through statistical probability distribution. These probabilities are calulated from the logarithm of probabilities (logprobs). Based on configurations (tempature, top_p etc.) these probabilities can be set and then the LLM selects the next "best token" based on the different configurations. Because these LLMs are probabilistic in nature, this is why you may see different outputs for the same question to the LLM. Below is an example of a question and answer and the associated probabilities for the two tokens (words) and the tokens that were selected to answer the question: "George Washington".
+What are LogProbs? Most current LLMs process prompt instructions by predicting the next token and iterate through each token until they reach a stopping point (i.e. max token length, completing the user instructions). Each next token that is considered for output is calculated through an internal LLM pipeline that outputs a statistical probability distribution. These probabilities are calculated from the logarithm of probabilities (logprobs). Based on configurations (temperature, top_p etc.) these probabilities can be set and then the LLM selects the next "best token" based on the different configurations. Because these LLMs are probabilistic in nature, this is why you may see different outputs for the same question to the LLM. Below is an example of a question and answer and the associated probabilities for the two tokens (words) that were selected to answer the question. For the answer "George Washington", the token probabilities were 99.62% and 99.99%.
 
 ![Azure LogProbs Example](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-Example.png)
 
-Recommended Reading on the background of Azure OpenAI LogProbs:  
+Recommended Reading on the background of Azure OpenAI Logprobs:  
    * OpenAI Cookbook - LogProbs: https://cookbook.openai.com/examples/using_logprobs  
-   * What are logprobs?: https://www.ignorance.ai/p/what-are-logprobs  
+   * What are Logprobs?: https://www.ignorance.ai/p/what-are-logprobs  
 
-There are several emerging techniques that use multiple calls to a model or several models to arrive at a response, conclusion or a decision. Currently, most ways LLMs are used in GenAI production systems is with grounding (RAG) by providing additional contextual information. The model is asked to answer a question, reason over that information etc. However, with poor grounding, this can result in poor results.  
+There are several emerging techniques that use multiple calls to a model or several models to arrive at a response, conclusion or a quality decision. Currently, most ways LLMs are used in GenAI production systems is with grounding (RAG) by providing additional contextual information. The model is asked to answer a question, reason over that information etc. However, with poor grounding, this can result in poor results.  
 
 Azure OpenAI LogProbs are a tool that can help and be used to gauge the confidence (probability) of the model's response.
 This tremendous capability can empower the AI system to self-correct or guide the user/agent to arrive at a better response.
@@ -61,7 +61,7 @@ Example Output:
 
 Brier scores will vary depending on the model capabilities, the prompt, and the context of the question. Keeping the prompt and context the same, one can compare overall model accuracy performance.
 Note the Brier scores below comparing GPT-4 and GPT-35 (Turbo) models. The GPT-4-20240409 model has a lower Brier score, which means it is more accurate in predicting the probability of the correct answer response.
-In fact, the GPT-4-20240409 correctly arrived at the final answer correctly 11 of the 12 times, whereas the GPT-35 (Turbo) model only matched the expected answer (if there is enough info in the context to answer the question) 10 of 12 times.  
+In fact, the GPT-4-2024-04-09 correctly arrived at the final answer correctly 11 of the 12 times, whereas the GPT-35 (Turbo) model only matched the expected answer (if there is enough info in the context to answer the question) 10 of 12 times.  
 
 Example Output:
 ![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-4](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT4-Turbo-20240409.png)  
