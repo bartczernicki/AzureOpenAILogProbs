@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Azure.AI.OpenAI;
 using Azure.Core;
+using AzureOpenAILogProbs.DTOs;
 using ConsoleTables;
 using MathNet.Numerics.Statistics;
 using Microsoft.Extensions.Configuration;
@@ -44,15 +45,15 @@ namespace AzureOpenAILogProbs
                 var azureModelDeploymentName = configuration.GetSection("AzureOpenAI")["ModelDeploymentName"];
 
                 // Define the OpenAI Client Options, increase max retries and delay for the exponential backoff
+                // Note: This is better handled by a Polly Retry Policy using 429 status codes for optimization
                 OpenAIClientOptions openAIClientOptions = new OpenAIClientOptions { Retry = { Delay = TimeSpan.FromSeconds(2), MaxDelay = TimeSpan.FromSeconds(30), MaxRetries = 5, Mode = RetryMode.Exponential } };
                 Uri azureOpenAIResourceUri = new(azureOpenAIEndpoint!);
                 AzureKeyCredential azureOpenAIApiKey = new(azureOpenAIAPIKey!);
 
                 // Info: https://github.com/Azure/azure-sdk-for-net/tree/Azure.AI.OpenAI_1.0.0-beta.16/sdk/openai/Azure.AI.OpenAI 
                 OpenAIClient client = new(azureOpenAIResourceUri, azureOpenAIApiKey, openAIClientOptions);
-
                 var modelDeploymentName = azureModelDeploymentName;
-
+             
                 // Define a sample Wikipedia Article to use as grounding information for the questions
                 // https://en.wikipedia.org/wiki/New_York_Mets 
                 var sampleWikipediaArticle = """
@@ -107,21 +108,7 @@ namespace AzureOpenAILogProbs
 
                 // Define sample list of questions to ask the model
                 // Note: The questions are a mix of True/False questions and highly dependent on the sample Wikipedia article above (Mets)
-                var questions = new List<Question>
-                {
-                new Question{ Number = 1, EnoughInformationInProvidedContext = true, QuestionText = "When where the Mets founded?" },
-                new Question{ Number = 2, EnoughInformationInProvidedContext = true, QuestionText = "Are the Mets a baseball team?" },
-                new Question{ Number = 3, EnoughInformationInProvidedContext = true, QuestionText = "Who owns the Mets?" },
-                new Question{ Number = 4, EnoughInformationInProvidedContext = false, QuestionText = "Have the Mets won the 2023 World Series?" },
-                new Question{ Number = 5, EnoughInformationInProvidedContext = false, QuestionText = "Who are the Boston Red Sox?" }, 
-                new Question{ Number = 6, EnoughInformationInProvidedContext = true, QuestionText = "Where the Mets were a bad team in the 1960s?" },
-                new Question{ Number = 7, EnoughInformationInProvidedContext = true, QuestionText = "Do the Mets uniforms include the colors blue and orange?" },
-                new Question{ Number = 8, EnoughInformationInProvidedContext = false, QuestionText = "Are the there only 2 colors on the Mets uniform?" },
-                new Question{ Number = 9, EnoughInformationInProvidedContext = false, QuestionText = "Do you think the Mets were a historically very good team?" },
-                new Question{ Number = 10, EnoughInformationInProvidedContext = true, QuestionText = "Did the Mets have a winning season in their inaugural season of play?" },
-                new Question{ Number = 11, EnoughInformationInProvidedContext = false, QuestionText = "Has Steve Cohen been the longest-serving owner of the Mets?" },
-                new Question { Number = 12, EnoughInformationInProvidedContext = false, QuestionText = "Is Citi Field located on the exact original site of Shea Stadium?" }
-                };
+                var questions = Services.Questions.GetQuestions();
 
                 // Process the selected option
                 if  (
@@ -197,7 +184,7 @@ namespace AzureOpenAILogProbs
                                 Number = question.Number,
                                 Answer = bool.Parse(responseMessageTrueFalse.Content),
                                 ExpectedAnswer = question.EnoughInformationInProvidedContext,
-                                DoesAnswerMatchExpectedAnswer = (bool.Parse(responseMessageTrueFalse.Content) == question.EnoughInformationInProvidedContext),
+                                DoesLLMAnswerMatchExpectedAnswer = (bool.Parse(responseMessageTrueFalse.Content) == question.EnoughInformationInProvidedContext),
                                 AnswerProbability = probability
                             });
                         }
@@ -302,7 +289,7 @@ namespace AzureOpenAILogProbs
 
                         Console.WriteLine($"Weighted Probability Calculation Details: Valid Tokens Probability Mass Function: {Math.Round(confidenceScoreProbabilityMassFunctionSum, 5)}");
                         Console.WriteLine($"Weighted Probability Calculation Details: Scale Factor for PMF: {pmfScaleFactor}");
-                        Console.WriteLine($"Weighted Probability Calculation Details: Weighted (sum of Scores*Probabilities) Confidence Score: {Math.Round(confidenceScoreSum, 5)}");
+                        Console.WriteLine($"Weighted Probability Calculation Details: Weighted (Sum of Scores*Probabilities) Confidence Score: {Math.Round(confidenceScoreSum, 5)}");
                     } // end of foreach question loop
                 }
                 else if (selectedProcessingChoice == ProcessingOptions.ConfidenceInterval)
