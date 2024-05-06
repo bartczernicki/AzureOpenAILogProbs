@@ -137,7 +137,7 @@ Example Calibration in a real forecasting environment from Manifold Markets of t
 ![Manifold Markets Calibration](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ManifoldMarketsCalibration.png)  
 
 Statistical Simulation Showing 10,000,000 simulations and the expected ranges for 100 questions 80% calibration:    
-![Simulation of 80% answers](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/ExampleConfidenceIntervalSimulation/Images/ManifoldMarketsCalibration.png)  
+![Simulation of 80% answers](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/ExampleConfidenceIntervalSimulation/Images/ExampleConfidenceIntervalSimulation-Console.png)  
 
 The topic of calibration is not new and has been studied in decision theory and machine learning.
 You can apply both decision intelligence (cognitive science) and machine learning techniques to further calibrate the model performance.
