@@ -2,9 +2,9 @@
 
 ## Azure OpenAI LogProbs Examples  
    * .NET Console application that shows examples how Azure OpenAI LogProbs that can be useful for RAG implementations:
-     * Calculate First Token Probability - True or False probability, determine whether the (LLM) model has enough info to answer question  
-     * Calculate First Token Probability - True or False probability, determine whether the (LLM) model has enough info to answer question [With Brier Scores]  
-     * Weighted Probability of Confidence Score - Self Confidence Score that is weighted from LogProbs probability (PMF) distribution to give a better (weighted) confidence score estimate to answer a question
+     * 1) Calculate First Token Probability - True or False probability, returns the top probability whether the (LLM) model has enough info to answer question  
+     * 2) Calculate First Token Probability [With Brier Scores] - True or False probability, returns the top probability whether the (LLM) model has enough info to answer question. Calculates Brier Scores to measure the probabilistic forecasting capability of the model.
+     * Weighted Probability of Confidence Score - returns a Self Confidence Score that is weighted from a probability (top 5 probabilities) distribution to give a better (weighted) confidence score estimate to answer a question.
      * Confidence Interval - Calculated from bootstrap simulation of multiple calls to the model. This provides a 95% confidence interval (range) of plausible confidence scores. This is ideal when you need to understand a range of possibilities the model interprets rather than a single point estimate.
 
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbsConsoleApp.png)
