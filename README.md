@@ -13,7 +13,7 @@
 ```javascript
 {
   "AzureOpenAI": {
-    "ModelDeploymentName": "gpt-4-2024-04-09", // Any Azure OpenAI GPT-4 model should perform well
+    "ModelDeploymentName": "gpt-4-2024-04-09", // Any Azure OpenAI GPT-4  or GPT3.5 model should perform well
     "APIKey": "YOURAZUREOPENAIKEY",
     "Endpoint": "https://YOURAZUREOPENAIENDPOINT.openai.azure.com/"
   }
@@ -62,6 +62,9 @@ This is illustrated below with the diagram:
 Example Output:
 ![Azure OpenAI Log Probs - First Token Prob](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-FirstTokenProbability.png)  
 
+Note the image above illustrates the True and False output from the LLM as well as the probability of that True or False output.
+Because the True or False are the first and only tokens in the response, the first token (LogProb) probability can be used.
+
 
 ### 2) First Token Probability [With Brier Scores] - Calculating Brier Scores of the First Token Probability
    * This example shows how to measure the forecasting & predictive accuracy of the model.
@@ -91,11 +94,11 @@ Example Output:
    * The weighted probability is calculated by multiplication: Confidence Score*Probability to give a better weighted estimate of the confidence to answer the question.  
    * The weighted probability can be used as a better calibrated confidence score for the model's response.  
 
-Note you have to enable LogProbs and set the LogProbabilitiesPerToken to 5 (current Azure OpenAI maximum, as of this writing):  
+To return multiple Log Probabilities set the LogProbabilitiesPerToken to 5 (current Azure OpenAI maximum, as of this writing):  
 ```chsarp
 chatCompletionOptionsConfidenceScore.Temperature = 0.0f;
 chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
-// For the Confidence Score, we want to see 5 of the top log probabilities (PMF)
+// For the Confidence Score, we want to investigate 5 of the top log probabilities (PMF)
 chatCompletionOptionsConfidenceScore.LogProbabilitiesPerToken = 5;
 ```  
 
@@ -140,4 +143,4 @@ The topic of calibration is not new and has been studied in decision theory and 
 You can apply both decision intelligence (cognitive science) and machine learning techniques to further calibrate the model performance.
   * Calibrating Chat GPT for Its Overconfidence: https://hubbardresearch.com/chat-gpt-ai-calibration/  
   * Example of forecasters Manifold Markets calibration: https://manifold.markets/calibration  
-  * Calibrating LLM-Based Evaluator: https://arxiv.org/pdf/2309.13308.pdf  
+  * Calibrating a LLM-Based Evaluator: https://arxiv.org/pdf/2309.13308.pdf  
