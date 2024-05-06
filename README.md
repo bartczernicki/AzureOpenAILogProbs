@@ -20,20 +20,26 @@
 }
 ```  
 
-The ability to inspect token probabilities is turned off by default. To enable this feature, you need to set the EnableLogProbabilities to true.  
+The ability to inspect token probabilities is turned off by default. To enable this feature, you need to set the EnableLogProbabilities to true. 
+For example the .NET Azure OpenAI exposes this as a property.  
 ```csharp
 chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
 ```
 
 ## Background Information  
 
-What are LogProbs? Most current LLMs process prompt instructions by predicting the next token and iterate through each token until they reach a stopping point (i.e. max token length, completing the user instructions). Each next token that is considered for output is calculated through an internal LLM pipeline that outputs a statistical probability distribution. These probabilities are calculated from the logarithm of probabilities (logprobs). Based on configurations (temperature, top_p etc.) these probabilities can be set and then the LLM selects the next "best token" based on the different configurations. Because these LLMs are probabilistic in nature, this is why you may see different outputs for the same question to the LLM. Below is an example of a question and answer and the associated probabilities for the two tokens (words) that were selected to answer the question. In the example below the model output the answer "George Washington", using the token probabilities of 99.62% and 99.99%.
+What are LogProbs (Log Probabilities)? Most current LLMs process prompt instructions by predicting the next token and iterate through each token until they reach a stopping point (i.e. max token length, completing the user instructions). 
+Each next token that is considered for output is calculated through an internal LLM pipeline that outputs a statistical probability distribution. 
+Based on configurations (temperature, top_p etc.) these probabilities can be set and then the LLM selects the next "best token" based on the different configurations. 
+Because these LLMs are probabilistic in nature, this is why you may see different tokens output for the same prompt instruction sent to the LLM. 
+Below is an example of a question and answer and the associated probabilities for the two tokens (words) that were selected to answer the question: "Who was the first president of the United States?". 
+In the example below the model output the answer "George Washington", using the token probabilities of 99.62% and 99.99%.  
 
 ![Azure LogProbs Example](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-Example.png)
 
-Recommended Reading on the background of Azure OpenAI Logprobs:  
+Recommended Reading on the background of Azure OpenAI LogProbs:  
    * OpenAI Cookbook - LogProbs: https://cookbook.openai.com/examples/using_logprobs  
-   * What are Logprobs?: https://www.ignorance.ai/p/what-are-logprobs  
+   * What are LogProbs?: https://www.ignorance.ai/p/what-are-logprobs  
 
 There are several emerging techniques that use multiple calls to a model or several models to arrive at a response, conclusion or a quality decision. Currently, most ways LLMs are used in GenAI production systems is with grounding (RAG) by providing additional contextual information. The model is asked to answer a question, reason over that information etc. However, with poor grounding, this can result in poor results.  
 
@@ -47,27 +53,29 @@ This is illustrated below with the diagram:
 
 ## Console Processing Options  
 
-### 1) First Token Probability - How Confident is the AI Model with the information to answer the question  
-   * Uses the Azure OpenAI LogProbs to determine the probability of the first token in the response.
-   * If the probability is high, it is likely the model has enough information to answer the question.  
-   * If the probability is low, it is likely the model does not have enough information to answer the question.  
-   * The probability can be used as a decision threshold for a classification of whether the model has enough information (RAG context) to answer the question.     
+### 1) First Token Probability - How Confident is the AI (LLM) Model with the information to answer the question  
+   * Uses the Azure OpenAI LogProbs to determine the probability of only the first token in the response.
+   * If the probability is high, it is likely the model has enough information (RAG context) to answer the question.  
+   * If the probability is low, it is likely the model does not have enough information (RAG context) to answer the question.  
+   * The probability can be used as a classification decision threshold of whether the model has enough information (RAG context) to answer the question.     
 
 Example Output:
 ![Azure OpenAI Log Probs - First Token Prob](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-FirstTokenProbability.png)  
 
 
-### 2) First Token Probability - Calculating Brier Scores of the First Token Probability
-   * This example shows how to measure the predictive accuracy of the model.
+### 2) First Token Probability [With Brier Scores] - Calculating Brier Scores of the First Token Probability
+   * This example shows how to measure the forecasting & predictive accuracy of the model.
    * Same as the First Token Probability, but also calculates the Brier Score for each of the probability answers.
    * Brier scores (and similar methods in Machine Learning & Statistics) are used to measure the accuracy of probabilistic predictions.
    * The lower the Brier Score, the better the model is at predicting the probability of the answer response.
    * It outputs a table of the Brier Scores for each of the questions and the average Brier Score for all the questions.
-   * Averaging Brier scores can tell us a great deal about the overall performance accuracy of the model. Average Brier Scores of 0.1 or lower are excellent, 0.1-0.2 are superior, 0.2-0.3 are adequate, and 0.2-0.35 are acceptable, and finally average Brier scores above 0.35 illustrate the overall model performance is poor.
+   * Averaging Brier scores can tell us a great deal about the overall performance accuracy of the model. Average Brier Scores of 0.1 or lower are considered excellent, 0.1-0.2 are superior, 0.2-0.3 are adequate, and 0.2-0.35 are acceptable, and finally average Brier scores above 0.35 illustrate the overall model performance is poor.
 
-Brier scores will vary depending on the model capabilities, the prompt, and the context of the question. Keeping the prompt and context the same, one can compare overall model accuracy performance.
-Note the Brier scores below comparing GPT-4 and GPT-35 (Turbo) models. The GPT-4-20240409 model has a lower Brier score, which means it is more accurate in predicting the probability of the correct answer response.
-In fact, the GPT-4-2024-04-09 correctly arrived at the final answer correctly 11 of the 12 times, whereas the GPT-35 (Turbo) model only matched the expected answer (if there is enough info in the context to answer the question) 10 of 12 times.  
+Brier scores will vary depending on the model capabilities, the prompt, and the context of the question. 
+By keeping the prompt and context the same, one can compare overall model accuracy performance. 
+Note the Brier scores below comparing GPT-4 and GPT-35 (Turbo) models. The GPT-4-20240409 model has a lower Brier score, which means it is more accurate in predicting the probability of the correct answer response. 
+In fact, the GPT-4-2024-04-09 correctly arrived at the final answer correctly 11 of the 12 times, whereas the GPT-35 (Turbo) model only matched the expected answer (if there is enough info in the context to answer the question) 10 of 12 times. 
+Therefore, the Brier score of the GPT-4-2024-04-09 model is lower, which empirically shows it is more accurate in predicting the probability of estimating it has enough information to answer the provided question.
 
 Example Output:
 ![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-4](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT4-Turbo-20240409.png)  
@@ -75,11 +83,12 @@ Example Output:
 ![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-35](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT35-Turbo-0125.png)  
 
 
-
 ### 3) Weighted Probability of Confidence Score - Model provides a self-confidence score and then assess the probability of the confidence score
+   * In the previous examples, only the first token probability was used. Whichever token had the highest probability was used as the True or False determination. 
    * Azure OpenAI LogProbs can return a probability mass function (PMF) distribution of up to the next 5 tokens including their probabilities.  
    * This calculation uses multiple LogProbs to determine the "weighted" probability of the response.  
-   * The weighted probability is calculated by multiplication: confidence score*probability to give a better weighted estimate of the confidence to answer the question.  
+   * In addition, instead of asking the the model to just provide a True or False determination, the model can provide a confidence score (1-10) of how confident it is in answering the question.
+   * The weighted probability is calculated by multiplication: Confidence Score*Probability to give a better weighted estimate of the confidence to answer the question.  
    * The weighted probability can be used as a better calibrated confidence score for the model's response.  
 
 Note you have to enable LogProbs and set the LogProbabilitiesPerToken to 5 (current Azure OpenAI maximum, as of this writing):  
@@ -104,7 +113,7 @@ Example Output:
    * This calculation uses multiple LogProbs to determine the "confidence interval" of the response.  
    * The confidence interval is calculated by bootstrapping multiple calls (10) to the model (using the same prompt) and calculating the 95% confidence interval of the confidence scores.  
    * The confidence interval can be used to understand the range of possibilities, where 95% of the outcomes will fall within this range as the same question is repeated.
-   * Why would you call the model 10x, isn't that overkill? For high-stakes decisions and reasoning (buying a house/car, deciding on a 4-year degree), those extra few calls are well worth the few cents and seconds to get a proper error range.
+   * Why would you call the model 10x, isn't that overkill? For high-stakes decisions and reasoning (buying a house/car, deciding on a 4-year degree), those extra few calls are well worth the few cents and extra time to get a proper error range.
 
 Example Output:  
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-ConfidenceScoreInterval.png)  
