@@ -18,7 +18,13 @@
     "Endpoint": "https://YOURAZUREOPENAIENDPOINT.openai.azure.com/"
   }
 }
+```  
+
+The ability to inspect token probabilities is turned off by default. To enable this feature, you need to set the EnableLogProbabilities to true.  
+```csharp
+chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
 ```
+
 ## Background Information  
 
 What are LogProbs? Most current LLMs process prompt instructions by predicting the next token and iterate through each token until they reach a stopping point (i.e. max token length, completing the user instructions). Each next token that is considered for output is calculated through an internal LLM pipeline that outputs a statistical probability distribution. These probabilities are calculated from the logarithm of probabilities (logprobs). Based on configurations (temperature, top_p etc.) these probabilities can be set and then the LLM selects the next "best token" based on the different configurations. Because these LLMs are probabilistic in nature, this is why you may see different outputs for the same question to the LLM. Below is an example of a question and answer and the associated probabilities for the two tokens (words) that were selected to answer the question. In the example below the model output the answer "George Washington", using the token probabilities of 99.62% and 99.99%.
