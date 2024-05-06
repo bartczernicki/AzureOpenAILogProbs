@@ -147,17 +147,17 @@ namespace AzureOpenAILogProbs
 
                         // 2) True/False Question - Raw answers to the console
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine($"[Human Expected Answer (Enough Information) - True/False]: {question.EnoughInformationInProvidedContext}");
+                        Console.WriteLine($"[Human Expected LLMAnswer (Enough Information) - True/False]: {question.EnoughInformationInProvidedContext}");
                         Console.WriteLine($"[LLM {responseMessageTrueFalse.Role.ToString().ToUpperInvariant()} (Enough Information) - True/False]: {responseMessageTrueFalse.Content}");
 
-                        // 3) True/False Question - Answer Details
+                        // 3) True/False Question - LLMAnswer Details
                         // https://stackoverflow.com/questions/48465737/how-to-convert-log-probability-into-simple-probability-between-0-and-1-values-us
                         var logProbsTrueFalse = responseTrueFalse.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability of First Token (LLM Probability of having enough info for question): " + Math.Round(Math.Exp(a.LogProbability), 8));
                         var probability = Math.Round(Math.Exp(responseTrueFalse.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults[0].LogProbability), 8);
                         // Write out the first token probability
                         foreach (var logProb in logProbsTrueFalse)
                         {
-                            Console.WriteLine($"True/False Answer: {logProb}");
+                            Console.WriteLine($"True/False LLMAnswer: {logProb}");
                         }
 
                         // convert responseMessageTrueFalse.Content to bool
@@ -167,7 +167,7 @@ namespace AzureOpenAILogProbs
                             questionAnswers.Add(new QuestionAnswer
                             {
                                 Number = question.Number,
-                                Answer = bool.Parse(responseMessageTrueFalse.Content),
+                                LLMAnswer = bool.Parse(responseMessageTrueFalse.Content),
                                 ExpectedAnswer = question.EnoughInformationInProvidedContext,
                                 DoesLLMAnswerMatchExpectedAnswer = (bool.Parse(responseMessageTrueFalse.Content) == question.EnoughInformationInProvidedContext),
                                 AnswerProbability = probability
@@ -239,7 +239,7 @@ namespace AzureOpenAILogProbs
 
                         // 2) Confidence Score Question - Raw answers to the console
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine($"[Human Expected Answer (Enough Information) - True/False]: {question.EnoughInformationInProvidedContext}");
+                        Console.WriteLine($"[Human Expected LLMAnswer (Enough Information) - True/False]: {question.EnoughInformationInProvidedContext}");
                         Console.WriteLine($"[LLM {responseMessageConfidenceScore.Role.ToString().ToUpperInvariant()} (Enough Information) - Confidence Score]: {responseMessageConfidenceScore.Content}");
 
                         // 3) Confidence Score Question - Process the Confidence Score answer details

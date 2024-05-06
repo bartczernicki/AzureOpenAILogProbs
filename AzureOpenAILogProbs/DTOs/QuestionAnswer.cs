@@ -10,7 +10,7 @@ namespace AzureOpenAILogProbs.DTOs
     {
         public int Number { get; set; }
         public bool ExpectedAnswer { get; set; }
-        public bool Answer { get; set; }
+        public bool LLMAnswer { get; set; }
         public bool DoesLLMAnswerMatchExpectedAnswer { get; set; }
         public double AnswerProbability { get; set; }
         public double BrierScore
