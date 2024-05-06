@@ -1,6 +1,6 @@
 ![Azure OpenAI LogProbs Title](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-Title.png)
 
-## Azure OpenAI LogProbs Examples  
+## Azure OpenAI Log Probabilities (LogProbs) Examples  
    * .NET Console application that shows examples how Azure OpenAI LogProbs that can be useful for RAG implementations:
      * 1) Calculate First Token Probability - True or False probability, returns the top probability whether the (LLM) model has enough info to answer question  
      * 2) Calculate First Token Probability [With Brier Scores] - True or False probability, returns the top probability whether the (LLM) model has enough info to answer question. Calculates Brier Scores to measure the probabilistic forecasting capability of the model.
@@ -20,7 +20,7 @@
 }
 ```  
 
-The ability to inspect token probabilities is turned off by default. To enable this feature, you need to set the EnableLogProbabilities to true. 
+The ability to inspect token log probabilities is turned off by default. To enable this feature, you need to set the EnableLogProbabilities to true. 
 For example the .NET Azure OpenAI exposes this as a property.  
 ```csharp
 chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
