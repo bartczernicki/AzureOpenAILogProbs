@@ -1,10 +1,15 @@
 ﻿using Azure;
 using Azure.AI.OpenAI;
 using Azure.Core;
+using Azure.Core.Pipeline;
 using AzureOpenAILogProbs.DTOs;
+using AzureOpenAILogProbs.Services;
 using ConsoleTables;
 using MathNet.Numerics.Statistics;
 using Microsoft.Extensions.Configuration;
+using OpenAI;
+using OpenAI.Chat;
+using System.ClientModel.Primitives;
 
 namespace AzureOpenAILogProbs
 {
@@ -46,12 +51,15 @@ namespace AzureOpenAILogProbs
 
                 // Define the OpenAI Client Options, increase max retries and delay for the exponential backoff
                 // Note: This is better handled by a Polly Retry Policy using 429 status codes for optimization
-                OpenAIClientOptions openAIClientOptions = new OpenAIClientOptions { Retry = { Delay = TimeSpan.FromSeconds(2), MaxDelay = TimeSpan.FromSeconds(30), MaxRetries = 5, Mode = RetryMode.Exponential } };
+                var retryPolicy = new ClientRetryPolicy(maxRetries: 5);
+                AzureOpenAIClientOptions azureOpenAIClientOptions = new AzureOpenAIClientOptions();
+                azureOpenAIClientOptions.RetryPolicy = retryPolicy;
+
                 Uri azureOpenAIResourceUri = new(azureOpenAIEndpoint!);
-                AzureKeyCredential azureOpenAIApiKey = new(azureOpenAIAPIKey!);
+                AzureKeyCredential azureKeyCredential = new(azureOpenAIAPIKey!);
 
                 // Info: https://github.com/Azure/azure-sdk-for-net/tree/Azure.AI.OpenAI_1.0.0-beta.16/sdk/openai/Azure.AI.OpenAI 
-                OpenAIClient client = new(azureOpenAIResourceUri, azureOpenAIApiKey, openAIClientOptions);
+                var client = new AzureOpenAIClient(azureOpenAIResourceUri, azureKeyCredential, azureOpenAIClientOptions);
                 var modelDeploymentName = azureModelDeploymentName;
              
                 // Define a sample Wikipedia Article to use as grounding information for the questions
@@ -121,23 +129,23 @@ namespace AzureOpenAILogProbs
                         Respond with just one word, the Boolean true or false. You must output the word 'True', or the word 'False', nothing else.
                         """;
 
-                        var chatCompletionsOptionsTrueFalse = new ChatCompletionsOptions()
-                        {
-                            DeploymentName = modelDeploymentName, // Use DeploymentName for "model" with Azure clients
-                            Messages =
-                            {
-                                // The system message represents instructions or other guidance about how the assistant should behave
-                                new ChatRequestSystemMessage("You are an assistant testing large language model features. Follow the instructions provided in the prompt."),
-                                // User messages represent current or historical input from the end user
-                                new ChatRequestUserMessage(promptInstructionsTrueFalse)
-                            }
-                        };
 
-                        chatCompletionsOptionsTrueFalse.Temperature = 0.0f;
-                        chatCompletionsOptionsTrueFalse.EnableLogProbabilities = true;
+                        var chatCompletionsOptionsTrueFalse = GenAI.GetChatCompletionOptions(0.0f, false);
 
-                        Response<ChatCompletions> responseTrueFalse = await client.GetChatCompletionsAsync(chatCompletionsOptionsTrueFalse);
-                        ChatResponseMessage responseMessageTrueFalse = responseTrueFalse.Value.Choices[0].Message;
+                        //var systemChatMessage = new SystemChatMessage("You are an assistant testing large language model features. Follow the instructions provided in the prompt.");
+                        //var userChatMessage = new UserChatMessage(promptInstructionsTrueFalse);
+
+                        //var chatMessages = new List<ChatMessage>();
+                        //chatMessages.Add(systemChatMessage);
+                        //chatMessages.Add(userChatMessage);
+
+                        var chatMessages = GenAI.BuildChatMessageHistory(promptInstructionsTrueFalse);
+
+                        // Get new chat client
+                        var chatClient = client.GetChatClient(modelDeploymentName);
+
+                        var response = await chatClient.CompleteChatAsync(chatMessages, chatCompletionsOptionsTrueFalse);
+                        var responseValueContent = response.Value.Content.ToString();
 
                         // 1) Write the Question to the console
                         Console.ForegroundColor = ConsoleColor.Yellow;
@@ -148,12 +156,13 @@ namespace AzureOpenAILogProbs
                         // 2) True/False Question - Raw answers to the console
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.WriteLine($"[Human Expected LLMAnswer (Enough Information) - True/False]: {question.EnoughInformationInProvidedContext}");
-                        Console.WriteLine($"[LLM {responseMessageTrueFalse.Role.ToString().ToUpperInvariant()} (Enough Information) - True/False]: {responseMessageTrueFalse.Content}");
+                        Console.WriteLine($"[LLM {response.Value.Role.ToString().ToUpperInvariant()} (Enough Information) - True/False]: {responseValueContent}");
 
+                        
                         // 3) True/False Question - LLMAnswer Details
                         // https://stackoverflow.com/questions/48465737/how-to-convert-log-probability-into-simple-probability-between-0-and-1-values-us
-                        var logProbsTrueFalse = responseTrueFalse.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability of First Token (LLM Probability of having enough info for question): " + Math.Round(Math.Exp(a.LogProbability), 8));
-                        var probability = Math.Round(Math.Exp(responseTrueFalse.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults[0].LogProbability), 8);
+                        var logProbsTrueFalse = response.Value.ContentTokenLogProbabilities.Select(a => a.Token + " | Probability of First Token (LLM Probability of having enough info for question): " + Math.Round(Math.Exp(a.LogProbability), 8));
+                        var probability = Math.Round(Math.Exp(response.Value.ContentTokenLogProbabilities[0].LogProbability), 8);
                         // Write out the first token probability
                         foreach (var logProb in logProbsTrueFalse)
                         {
@@ -161,20 +170,22 @@ namespace AzureOpenAILogProbs
                         }
 
                         // convert responseMessageTrueFalse.Content to bool
-                        var responseTrueFalseBool = responseMessageTrueFalse.Content == "True";
+                        var responseTrueFalseBool = responseValueContent == "True";
                         if (selectedProcessingChoice == ProcessingOptions.FirstTokenProbabilityWithBrierScore)
                         {
+                            var responseText = response.Value.Content[0].Text;
                             questionAnswers.Add(new QuestionAnswer
                             {
                                 Number = question.Number,
-                                LLMAnswer = bool.Parse(responseMessageTrueFalse.Content),
+                                LLMAnswer = bool.Parse(responseText),
                                 ExpectedAnswer = question.EnoughInformationInProvidedContext,
-                                DoesLLMAnswerMatchExpectedAnswer = (bool.Parse(responseMessageTrueFalse.Content) == question.EnoughInformationInProvidedContext),
+                                DoesLLMAnswerMatchExpectedAnswer = (bool.Parse(responseText) == question.EnoughInformationInProvidedContext),
                                 AnswerProbability = probability
                             });
                         }
                     } // end of foreach question loop
-
+                    
+                    // Add Brier Score Information
                     if (selectedProcessingChoice == ProcessingOptions.FirstTokenProbabilityWithBrierScore)
                     {
                         // Show the Brier Score for the answers in a table
@@ -210,26 +221,18 @@ namespace AzureOpenAILogProbs
                         Respond with just one confidence score number between 1 to 10. You must output a single number, nothing else.
                         """;
 
-                        var chatCompletionOptionsConfidenceScore = new ChatCompletionsOptions()
-                        {
-                            DeploymentName = modelDeploymentName, // Use DeploymentName for "model" with Azure clients
-                            Messages =
-                            {
-                                // The system message represents instructions or other guidance about how the assistant should behave
-                                new ChatRequestSystemMessage("You are an assistant testing large language model features. Follow the instructions provided in the prompt."),
-                                // User messages represent current or historical input from the end user
-                                new ChatRequestUserMessage(promptInstructionsConfidenceScore)
-                            }
-                        };
+                        var chatMessages = GenAI.BuildChatMessageHistory(promptInstructionsConfidenceScore);
 
-                        chatCompletionOptionsConfidenceScore.Temperature = 0.0f;
-                        chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
-                        // For the Confidence Score, we want to see 5 of the top log probabilities (PMF); 5 is currently the max
-                        chatCompletionOptionsConfidenceScore.LogProbabilitiesPerToken = 5;
+                        // Get new chat client
+                        var chatClient = client.GetChatClient(modelDeploymentName);
 
-                        
-                        Response<ChatCompletions> responseConfidenceScore = await client.GetChatCompletionsAsync(chatCompletionOptionsConfidenceScore);
-                        ChatResponseMessage responseMessageConfidenceScore = responseConfidenceScore.Value.Choices[0].Message;
+                        var chatCompletionOptionsConfidenceScore = GenAI.GetChatCompletionOptions(0.0f, true);
+
+                        var response = await chatClient.CompleteChatAsync(chatMessages, chatCompletionOptionsConfidenceScore);
+                        var responseValueContent = response.Value.Content[0].Text;
+
+
+                        //response.Value.
 
                         // 1) Write the Question to the console
                         Console.ForegroundColor = ConsoleColor.Yellow;
@@ -240,10 +243,10 @@ namespace AzureOpenAILogProbs
                         // 2) Confidence Score Question - Raw answers to the console
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.WriteLine($"[Human Expected LLMAnswer (Enough Information) - True/False]: {question.EnoughInformationInProvidedContext}");
-                        Console.WriteLine($"[LLM {responseMessageConfidenceScore.Role.ToString().ToUpperInvariant()} (Enough Information) - Confidence Score]: {responseMessageConfidenceScore.Content}");
+                        Console.WriteLine($"[LLM {response.Value.Role.ToString().ToUpperInvariant()} (Enough Information) - Confidence Score]: {response.Value.Content[0].Text}");
 
                         // 3) Confidence Score Question - Process the Confidence Score answer details
-                        var logProbsConfidenceScore = responseConfidenceScore.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => a.Token + " | Probability of First Token (LLM Probability of Self-Confidence Score in having enough info for question): " + Math.Round(Math.Exp(a.LogProbability), 8));
+                        var logProbsConfidenceScore = response.Value.ContentTokenLogProbabilities.Select(a => a.Token + " | Probability of First Token (LLM Probability of Self-Confidence Score in having enough info for question): " + Math.Round(Math.Exp(a.LogProbability), 8));
                         // Write out the first token probability
                         foreach (var logProb in logProbsConfidenceScore)
                         {
@@ -251,7 +254,7 @@ namespace AzureOpenAILogProbs
                         }
                         // Write out up to the first 5 valid tokens (integers that match prompt instructions)
                         Console.WriteLine("\tProbability Distribution (PMF) for the Confidence Score (Top 5 LogProbs tokens):");
-                        foreach (var tokenLogProbabilityResult in responseConfidenceScore!.Value.Choices[0].LogProbabilityInfo!.TokenLogProbabilityResults!.FirstOrDefault()!.TopLogProbabilityEntries)
+                        foreach (var tokenLogProbabilityResult in response.Value.ContentTokenLogProbabilities[0].TopLogProbabilities)
                         {
                             if (int.TryParse(tokenLogProbabilityResult.Token, out _))
                             {
@@ -263,7 +266,7 @@ namespace AzureOpenAILogProbs
                         }
 
                         // 4) Retrieve the Top 5 Log Probability Entries for the Confidence Score
-                        var topLogProbabilityEntriesConfidenceScore = responseConfidenceScore!.Value.Choices[0].LogProbabilityInfo!.TokenLogProbabilityResults!.FirstOrDefault()!.TopLogProbabilityEntries;
+                        var topLogProbabilityEntriesConfidenceScore = response.Value.ContentTokenLogProbabilities[0].TopLogProbabilities;
 
                         // 5) Calculate the PMF (Probability Mass Function) for the Confidence Score, for only the valid integer tokens
                         var confidenceScoreProbabilityMassFunctionSum = topLogProbabilityEntriesConfidenceScore.Select(a => int.TryParse(a.Token, out _) ? Math.Exp(a.LogProbability) : 0).Sum();
@@ -304,39 +307,30 @@ namespace AzureOpenAILogProbs
                         Respond with just one confidence score number between 1 to 10. You must output a single number, nothing else.
                         """;
 
-                    var chatCompletionOptionsConfidenceScore = new ChatCompletionsOptions()
-                    {
-                        DeploymentName = modelDeploymentName, // Use DeploymentName for "model" with Azure clients
-                        Messages =
-                            {
-                                // The system message represents instructions or other guidance about how the assistant should behave
-                                new ChatRequestSystemMessage("You are an assistant testing large language model features. Follow the instructions provided in the prompt."),
-                                // User messages represent current or historical input from the end user
-                                new ChatRequestUserMessage(promptInstructionsConfidenceScore)
-                            }
-                    };
 
-                    // Set this to a typical Temperature setting
-                    chatCompletionOptionsConfidenceScore.Temperature = 0.7f;
-                    chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
-                    // For the Confidence Score, we want to see 5 of the top log probabilities (PMF)
-                    chatCompletionOptionsConfidenceScore.LogProbabilitiesPerToken = 5;
+                    var chatMessages = GenAI.BuildChatMessageHistory(promptInstructionsConfidenceScore);
+
+                    // Get new chat client
+                    var chatClient = client.GetChatClient(modelDeploymentName);
+                    
+                    // Set the Temperature higher to create variance in the responses
+                    var chatCompletionOptionsConfidenceScore = GenAI.GetChatCompletionOptions(0.8f, true);
 
                     // Loop through the Confidence Score question multiple times (10x)
                     var weightedConfidenceScores = new List<double>();
-                    for (int i =0; i != 10; i++)
+                    for (int i = 0; i != 10; i++)
                     {
-                        Response<ChatCompletions> responseConfidenceScore = await client.GetChatCompletionsAsync(chatCompletionOptionsConfidenceScore);
-                        ChatResponseMessage responseMessageConfidenceScore = responseConfidenceScore.Value.Choices[0].Message;
+                        var response = await chatClient.CompleteChatAsync(chatMessages, chatCompletionOptionsConfidenceScore);
+                        var responseValueContent = response.Value.Content[0].Text;
                         Console.ForegroundColor = ConsoleColor.Yellow;
 
                         // 2) Confidence Score Question - Raw answers to the console
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine($"[{responseMessageConfidenceScore.Role.ToString().ToUpperInvariant()} - Confidence Score]: {responseMessageConfidenceScore.Content}");
+                        Console.WriteLine($"[{response.Value.Role.ToString().ToUpperInvariant()} - Confidence Score]: {responseValueContent}");
 
                         // 3) Confidence Score Question - Process the Confidence Score answer details
-                        var logProbsConfidenceScore = responseConfidenceScore.Value.Choices[0].LogProbabilityInfo.TokenLogProbabilityResults.Select(a => $"Confidence Score: {a.Token} | Probability of First Token: {Math.Round(Math.Exp(a.LogProbability), 10)}");
-                        
+                        var logProbsConfidenceScore = response.Value.ContentTokenLogProbabilities.Select(a => $"Confidence Score: {a.Token} | Probability of First Token: {Math.Round(Math.Exp(a.LogProbability), 10)}");
+
                         // Write out the first token probability
                         foreach (var logProb in logProbsConfidenceScore)
                         {
@@ -344,7 +338,7 @@ namespace AzureOpenAILogProbs
                         }
                         // Write out up to the first 5 valid tokens (integers that match prompt instructions)
                         Console.WriteLine("\tProbability Distribution (PMF) for the Confidence Score (Top 5 LogProbs tokens):");
-                        foreach (var tokenLogProbabilityResult in responseConfidenceScore!.Value.Choices[0].LogProbabilityInfo!.TokenLogProbabilityResults!.FirstOrDefault()!.TopLogProbabilityEntries)
+                        foreach (var tokenLogProbabilityResult in response.Value.ContentTokenLogProbabilities[0].TopLogProbabilities)
                         {
                             if (int.TryParse(tokenLogProbabilityResult.Token, out _))
                             {
@@ -356,7 +350,7 @@ namespace AzureOpenAILogProbs
                         }
 
                         // 4) Retrieve the Top 5 Log Probability Entries for the Confidence Score
-                        var topLogProbabilityEntriesConfidenceScore = responseConfidenceScore!.Value.Choices[0].LogProbabilityInfo!.TokenLogProbabilityResults!.FirstOrDefault()!.TopLogProbabilityEntries;
+                        var topLogProbabilityEntriesConfidenceScore = response.Value.ContentTokenLogProbabilities[0].TopLogProbabilities;
 
                         // 5) Calculate the PMF (Probability Mass Function) for the Confidence Score, for only the valid integer tokens
                         var confidenceScoreProbabilityMassFunctionSum = topLogProbabilityEntriesConfidenceScore.Select(a => int.TryParse(a.Token, out _) ? Math.Exp(a.LogProbability) : 0).Sum();
