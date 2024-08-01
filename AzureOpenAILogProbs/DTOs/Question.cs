@@ -10,6 +10,6 @@ namespace AzureOpenAILogProbs.DTOs
     {
         public int Number { get; set; }
         public bool EnoughInformationInProvidedContext { get; set; }
-        public string QuestionText { get; set; }
+        public required string QuestionText { get; set; }
     }
 }
