@@ -13,7 +13,7 @@
 
             var random = new Random();  // Add seed for reproducibility
             var bootstrapConfidenceScores = new List<double>();
-            for (int i = 0; i != NUMBEROFSIMULATIONS; i++) // 1,000 Bootstrap Simulations (bootstrap estimates)
+            for (int i = 0; i != NUMBEROFSIMULATIONS; i++) // Bootstrap Simulations (bootstrap estimates)
             {
                 var bootstrapSample = new List<double>();
                 for (int j = 0; j != 100; j++)
