@@ -204,7 +204,7 @@ namespace AzureOpenAILogProbs
                         Note:
                         Lower Brier Scores are better, closer to 0.0 is ideal. Higher Brier Scores are worse, closer to 1.0 is bad.
                         Average Brier Scores of 0.1 or lower are considered excellent, 0.1 - 0.2 are superior, 0.2 - 0.3 are adequate, 
-                        and 0.2-0.35 are acceptable, and finally average Brier scores above 0.35 illustrate the overall model performance is poor.
+                        and 0.3-0.35 are acceptable, and finally average Brier scores above 0.35 indicate poor prediction performance.
                         """);
                     }
                 }
