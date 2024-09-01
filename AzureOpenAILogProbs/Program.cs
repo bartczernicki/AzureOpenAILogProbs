@@ -155,7 +155,7 @@ namespace AzureOpenAILogProbs
                         // 1) Write the Question to the console
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine();
-                        Console.WriteLine($"{question.Number}) {question.QuestionText}");
+                        Console.WriteLine($"{question.Number}) Is there information present to answer the question: {question.QuestionText}");
                         Console.ResetColor();
 
                         // 2) True/False Question - Raw answers to the console
@@ -249,16 +249,17 @@ namespace AzureOpenAILogProbs
                         // 1) Write the Question to the console
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine();
-                        Console.WriteLine($"{question.Number}) {question.QuestionText}");
+                        Console.WriteLine($"{question.Number}) Is there information present to answer the question: {question.QuestionText}");
                         Console.ResetColor();
 
                         // 2) Confidence Score Question - Raw answers to the console
+                        var confidenceScore = Int32.Parse(response.Value.Content[0].Text);
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine($"[Human Expected Answer (Enough Information) - True/False]: {question.EnoughInformationInProvidedContext}");
-                        Console.WriteLine($"[LLM {response.Value.Role.ToString().ToUpperInvariant()} (Enough Information) - Confidence Score]: {response.Value.Content[0].Text}");
+                        Console.WriteLine($"[Human Expected Answer (Q: Is There Enough Information) - True/False]: {question.EnoughInformationInProvidedContext}");
+                        Console.WriteLine($"[LLM {response.Value.Role.ToString().ToUpperInvariant()}  Answer (Q: Is There Enough Information) - Confidence Score]: {confidenceScore}");
 
                         // 3) Confidence Score Question - Process the Confidence Score answer details
-                        var logProbsConfidenceScore = response.Value.ContentTokenLogProbabilities.Select(a => a.Token + " | Probability of First Token (LLM Probability of Self-Confidence Score in having enough info for question): " + Math.Round(Math.Exp(a.LogProbability), 8));
+                        var logProbsConfidenceScore = response.Value.ContentTokenLogProbabilities.Select(a => a.Token + " | Probability of Self-Confidence Score to answer the question): " + Math.Round(Math.Exp(a.LogProbability), 8));
                         // Write out the first token probability
                         foreach (var logProb in logProbsConfidenceScore)
                         {
@@ -270,8 +271,10 @@ namespace AzureOpenAILogProbs
                         {
                             if (int.TryParse(tokenLogProbabilityResult.Token, out _))
                             {
+                                var padding = tokenLogProbabilityResult.Token.Length == 2 ? string.Empty : " ";
+
                                 Console.ForegroundColor = ConsoleColor.Blue;
-                                Console.WriteLine($"\tConfidence Score: {tokenLogProbabilityResult.Token} | Probability: {Math.Round(Math.Exp(tokenLogProbabilityResult.LogProbability), 8)}");
+                                Console.WriteLine($"\tConfidence Score: {tokenLogProbabilityResult.Token}{padding} | Probability: {Math.Round(Math.Exp(tokenLogProbabilityResult.LogProbability), 8)}");
                                 Console.ForegroundColor = ConsoleColor.Cyan;
                             }
 
