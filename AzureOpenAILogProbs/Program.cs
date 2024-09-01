@@ -36,6 +36,7 @@ namespace AzureOpenAILogProbs
                     #       #    # #  ### #       #####  #    # #    #      #    #         ##   ###### #    # #####  #      #           # 
                     #       #    # #    # #       #   #  #    # #    # #    #    #        #  #  #    # #    # #      #      #      #    # 
                     #######  ####   ####  #       #    #  ####  #####   ####     ####### #    # #    # #    # #      ###### ######  #### 
+                    
                     """;
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Write(asciiBanner);
@@ -45,9 +46,20 @@ namespace AzureOpenAILogProbs
                 ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
                 IConfiguration configuration = configurationBuilder.AddUserSecrets<Program>().Build();
 
+                // Retrieve the Azure OpenAI Configuration Section
+                var azureOpenAISection = configuration.GetSection("AzureOpenAI");
+
                 var azureOpenAIAPIKey = configuration.GetSection("AzureOpenAI")["APIKey"];
                 var azureOpenAIEndpoint = configuration.GetSection("AzureOpenAI")["Endpoint"];
                 var azureModelDeploymentName = configuration.GetSection("AzureOpenAI")["ModelDeploymentName"];
+
+                // check if Secrets values are not NULL/missing
+                if (string.IsNullOrEmpty(azureOpenAIAPIKey) || string.IsNullOrEmpty(azureOpenAIEndpoint) || string.IsNullOrEmpty(azureModelDeploymentName))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Azure OpenAI Configuration is missing, please check your user secrets configuration.");
+                    Console.ReadLine();
+                }
 
                 // Define the OpenAI Client Options, increase max retries and delay for the exponential backoff
                 // Note: This is better handled by a Polly Retry Policy using 429 status codes for optimization
