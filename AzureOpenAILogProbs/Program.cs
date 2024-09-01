@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel.Primitives;
+using System.Runtime.CompilerServices;
 
 namespace AzureOpenAILogProbs
 {
@@ -61,9 +62,12 @@ namespace AzureOpenAILogProbs
                     Console.ReadLine();
                 }
 
+                // Set the LLM Tempature
+                const float OPENAITEMPATURE = 0.3f; // Max value 2. Very direct and instructive prompts will negate temperature.
+
                 // Define the OpenAI Client Options, increase max retries and delay for the exponential backoff
                 // Note: This is better handled by a Polly Retry Policy using 429 status codes for optimization
-                var retryPolicy = new ClientRetryPolicy(maxRetries: 5);
+                var retryPolicy = new ClientRetryPolicy(maxRetries: 10);
                 AzureOpenAIClientOptions azureOpenAIClientOptions = new AzureOpenAIClientOptions();
                 azureOpenAIClientOptions.RetryPolicy = retryPolicy;
 
@@ -143,7 +147,7 @@ namespace AzureOpenAILogProbs
                         """;
 
 
-                        var chatCompletionsOptionsTrueFalse = GenAI.GetChatCompletionOptions(0.0f, false);
+                        var chatCompletionsOptionsTrueFalse = GenAI.GetChatCompletionOptions(OPENAITEMPATURE, false);
                         var chatMessages = GenAI.BuildChatMessageHistory(promptInstructionsTrueFalse);
 
                         // Get new chat client
@@ -238,7 +242,7 @@ namespace AzureOpenAILogProbs
                         // Get new chat client
                         var chatClient = client.GetChatClient(modelDeploymentName);
 
-                        var chatCompletionOptionsConfidenceScore = GenAI.GetChatCompletionOptions(0.0f, true);
+                        var chatCompletionOptionsConfidenceScore = GenAI.GetChatCompletionOptions(OPENAITEMPATURE, true);
 
                         var response = await chatClient.CompleteChatAsync(chatMessages, chatCompletionOptionsConfidenceScore);
                         var responseValueContent = response.Value.Content[0].Text;
@@ -329,7 +333,7 @@ namespace AzureOpenAILogProbs
                     var chatClient = client.GetChatClient(modelDeploymentName);
                     
                     // Set the Temperature higher to create variance in the responses
-                    var chatCompletionOptionsConfidenceScore = GenAI.GetChatCompletionOptions(0.8f, true);
+                    var chatCompletionOptionsConfidenceScore = GenAI.GetChatCompletionOptions(OPENAITEMPATURE, true);
 
                     // Loop through the Confidence Score question multiple times (10x)
                     var weightedConfidenceScores = new List<double>();
