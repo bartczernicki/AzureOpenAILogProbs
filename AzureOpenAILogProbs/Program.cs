@@ -62,8 +62,11 @@ namespace AzureOpenAILogProbs
                     Console.ReadLine();
                 }
 
-                // Set the LLM Tempature
+                // Set the LLM Temperature
                 const float OPENAITEMPATURE = 0.3f; // Max value 2. Very direct and instructive prompts will negate temperature.
+
+                // Create a random number generator to prevent KV-Cache re-use
+                var randomGenerator = new Random();
 
                 // Define the OpenAI Client Options, increase max retries and delay for the exponential backoff
                 // Note: This is better handled by a Polly Retry Policy using 429 status codes for optimization
@@ -130,7 +133,10 @@ namespace AzureOpenAILogProbs
 
                     foreach (var question in questions)
                     {
+                        var randomSeed = randomGenerator.Next(1, 100000000);
+
                         var promptInstructionsTrueFalse = $"""
+                        Random Seed: {randomSeed}
                         Using this WIKIPEDIA ARTICLE as the ONLY source of information: 
                         --START OF WIKIPEDIA ARTICLE--
                         {sampleWikipediaArticle}
@@ -221,9 +227,16 @@ namespace AzureOpenAILogProbs
                     // From this Wikipedia article from the OpenAI Cookbook
                     // https://cookbook.openai.com/examples/using_logprobs
 
+
+                    // random.Next(1, 10000000);
+
                     foreach (var question in questions)
                     {
+                        var randomSeed = randomGenerator.Next(1, 100000000);
+
                         var promptInstructionsConfidenceScore = $"""
+                        Random Seed: { randomSeed}
+
                         Using this Wikipedia Article as the ONLY source of information: 
                         --START OF WIKIPEDIA ARTICLE--
                         {sampleWikipediaArticle}
@@ -296,13 +309,14 @@ namespace AzureOpenAILogProbs
 
                         Console.WriteLine($"Weighted Probability Calculation Details: Valid Tokens Probability Mass Function: {Math.Round(confidenceScoreProbabilityMassFunctionSum, 5)}");
                         Console.WriteLine($"Weighted Probability Calculation Details: Scale Factor for PMF: {pmfScaleFactor}");
-                        Console.WriteLine($"Weighted Probability Calculation Details: Weighted (Sum of Scores*Probabilities) Confidence Score: {Math.Round(confidenceScoreSum, 5)}");
+                        Console.WriteLine($"Weighted Probability Calculation Details: Weighted Confidence Score (Sum of Scores*Probabilities): {Math.Round(confidenceScoreSum, 5)}");
                     } // end of foreach question loop
                 }
                 else if (selectedProcessingChoice == ProcessingOptions.ConfidenceInterval)
                 {
                     // On this run, we will use a single question but run it multiple times to calculate the Confidence Interval
                     var question = "Has Steve Cohen been the longest-serving owner of the Mets?";
+                    // var question = questions.Where(a => a.Number == 17).FirstOrDefault()!.QuestionText;
 
                     // 1) Write the Question to the console
                     Console.ForegroundColor = ConsoleColor.Yellow;
@@ -311,7 +325,16 @@ namespace AzureOpenAILogProbs
                     Console.ResetColor();
 
                     // 2) Set up the prompt instructions and configuration for the Confidence Interval, it will be used for the loop
-                    var promptInstructionsConfidenceScore = $"""
+
+                    // Loop through the Confidence Score question multiple times (10x)
+                    var weightedConfidenceScores = new List<double>();
+
+                    for (int i = 0; i != 10; i++)
+                    {
+                        var randomSeed = randomGenerator.Next(1, 100000000);
+
+                        var promptInstructionsConfidenceScore = $"""
+                        Random Seed: {randomSeed}
                         Using this Wikipedia Article as the ONLY source of information: 
                         --START OF WIKIPEDIA ARTICLE--
                         {sampleWikipediaArticle}
@@ -322,23 +345,19 @@ namespace AzureOpenAILogProbs
                         -- END OF QUESTION--
                         INSTRUCTIONS: 
                         Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
+                        Do not hallucinate. Do not make up factual information.
                         Your output should JUST be the a single confidence score between 1 to 10, if you have sufficient information in the Wikipedia article to answer the question.
                         Respond with just one confidence score number between 1 to 10. You must output a single number, nothing else.
                         """;
 
+                        var chatMessages = GenAI.BuildChatMessageHistory(promptInstructionsConfidenceScore);
 
-                    var chatMessages = GenAI.BuildChatMessageHistory(promptInstructionsConfidenceScore);
+                        // Get new chat client
+                        var chatClient = client.GetChatClient(modelDeploymentName);
 
-                    // Get new chat client
-                    var chatClient = client.GetChatClient(modelDeploymentName);
-                    
-                    // Set the Temperature higher to create variance in the responses
-                    var chatCompletionOptionsConfidenceScore = GenAI.GetChatCompletionOptions(OPENAITEMPATURE, true);
+                        // Set the Temperature higher to create variance in the responses
+                        var chatCompletionOptionsConfidenceScore = GenAI.GetChatCompletionOptions(OPENAITEMPATURE, true);
 
-                    // Loop through the Confidence Score question multiple times (10x)
-                    var weightedConfidenceScores = new List<double>();
-                    for (int i = 0; i != 10; i++)
-                    {
                         var response = await chatClient.CompleteChatAsync(chatMessages, chatCompletionOptionsConfidenceScore);
                         var responseValueContent = response.Value.Content[0].Text;
                         Console.ForegroundColor = ConsoleColor.Yellow;
@@ -357,7 +376,9 @@ namespace AzureOpenAILogProbs
                         }
                         // Write out up to the first 5 valid tokens (integers that match prompt instructions)
                         Console.WriteLine("\tProbability Distribution (PMF) for the Confidence Score (Top 5 LogProbs tokens):");
-                        foreach (var tokenLogProbabilityResult in response.Value.ContentTokenLogProbabilities[0].TopLogProbabilities)
+
+                        var topLogProbabilities = response.Value.ContentTokenLogProbabilities[0].TopLogProbabilities;
+                        foreach (var tokenLogProbabilityResult in topLogProbabilities)
                         {
                             if (int.TryParse(tokenLogProbabilityResult.Token, out _))
                             {
