@@ -11,7 +11,7 @@ namespace AzureOpenAILogProbs.Services
     {
         public static string GetContextForQuestions()
         {
-            // Source: https://en.wikipedia.org/wiki/New_York_Mets 
+            // Selected source content from Wikipedia Mets article: https://en.wikipedia.org/wiki/New_York_Mets 
             var sampleWikipediaArticle = """
                 The New York Mets are an American professional baseball team based in the New York City borough of Queens.
                 The Mets compete in Major League Baseball (MLB) as a member of the National League (NL) East Division.
@@ -26,6 +26,22 @@ namespace AzureOpenAILogProbs.Services
                 The Mets have qualified for the postseason ten times, winning the World Series twice (1969 and 1986) and winning five National League pennants (most recently in 2000 and 2015), and six National League East division titles.
                 Since 2020, the Mets have been owned by billionaire hedge fund manager Steve Cohen, who purchased the team for $2.4 billion.[10] As of 2023, Forbes ranked the Mets as the sixth most valuable MLB team, valued at $2.9 billion.
                 As of the end of the 2023 regular season, the team's overall win–loss record is 4,727–5,075–8 (.482).
+
+                Mr. Met is the official mascot of the New York Mets. 
+                He was introduced on the cover of game programs in 1963, when the Mets were still playing at the Polo Grounds in northern Manhattan. 
+                When the Mets moved to Shea Stadium in 1964, fans were introduced to a live costumed version. 
+                Mr. Met is believed to have been the first mascot in Major League Baseball to exist in human (as opposed to artistically rendered) form.
+
+                The Mets have notable rivalries with the Atlanta Braves, the New York Yankees, and the Philadelphia Phillies. 
+                The Braves rivalry is due to division realignment that put both teams in the National League East in 1994. 
+                Their rivalry with the Yankees has its roots in the histories of the New York Giants, Brooklyn Dodgers, and the Yankees and the fierce Subway Series matchups between the two teams. 
+                The rivalry with the Phillies stems from the geographic New York-Philadelphia rivalry, which is also seen in other sports.
+
+                A registered 501(c)(3) charity, the New York Mets Foundation is the philanthropic organization of the New York Mets. 
+                Founded in 1963, it funds and promotes charitable causes in the Mets community. 
+                One of these causes is Tuesday's Children, is a non-profit family service organization that "has made a long term commitment to meet the needs of every family who lost a loved one in the terrorist attacks on September 11, 2001". 
+                The Mets host the annual Welcome Home Dinner, which raised over $550,000 for the Mets Foundation in 2012. 
+                All proceeds were distributed to Katz Institute for Women's Health and Katz Women's Hospitals of North Shore-LIJ Health System and The Leukemia & Lymphoma Society. 
                 """;
 
             return sampleWikipediaArticle;
@@ -46,8 +62,16 @@ namespace AzureOpenAILogProbs.Services
                 new Question{ Number = 9, EnoughInformationInProvidedContext = false, QuestionText = "Do you think the Mets fans are happy with the Mets historical performance?" },
                 new Question{ Number = 10, EnoughInformationInProvidedContext = true, QuestionText = "Did the Mets have a winning season in their inaugural season of play?" },
                 new Question{ Number = 11, EnoughInformationInProvidedContext = false, QuestionText = "Has Steve Cohen been the longest-serving owner of the Mets?" },
-                new Question{ Number = 12, EnoughInformationInProvidedContext = false, QuestionText = "Is Citi Field located on the exact site of the old Shea Stadium?" }
-                };
+                new Question{ Number = 12, EnoughInformationInProvidedContext = true, QuestionText = "Is Mr. Met the official mascot of the New York Mets?" },
+                new Question{ Number = 13, EnoughInformationInProvidedContext = false, QuestionText = "Is Mr. Met the official mascot of the New York Yankees?" },
+                new Question{ Number = 14, EnoughInformationInProvidedContext = true, QuestionText = "Do the New York Mets have notable rivalries with three other baseball teams?" },
+                new Question{ Number = 15, EnoughInformationInProvidedContext = false, QuestionText = $"The current year is: {DateTime.Now.Year}. Do you have a current year of the New York Met's worth?" },
+                new Question{ Number = 16, EnoughInformationInProvidedContext = true, QuestionText = "Are the Mets current notable rivals the Phillies, Braves and the Yankees?" },
+                new Question{ Number = 17, EnoughInformationInProvidedContext = false, QuestionText = "Is the Atlanta Braves rivalry due to both geographic and division reasons?" },
+                new Question{ Number = 18, EnoughInformationInProvidedContext = true, QuestionText = "Do the Mets have a registered foundation?" },
+                new Question{ Number = 19, EnoughInformationInProvidedContext = false, QuestionText = "Is the New York Mets Foundation the only charity or foundation from the Mets?" },
+                new Question{ Number = 20, EnoughInformationInProvidedContext = false, QuestionText = "Do the Mets have a charity cause for the September 11th attacks and World War 2 veterans?" }
+            };
 
             return questions;
         }
