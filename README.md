@@ -76,9 +76,9 @@ Because the True or False are the first and only tokens in the response, the fir
 
 Brier scores will vary depending on the model capabilities, the prompt, and the context of the question. 
 By keeping the prompt and context the same, one can compare overall model accuracy performance. 
-Note the Brier scores below comparing GPT-4 and GPT-35 (Turbo) models. The GPT-4-20240409 model has a lower Brier score, which means it is more accurate in predicting the probability of the correct answer response. 
-In fact, the GPT-4-2024-04-09 correctly arrived at the final answer correctly 11 of the 12 times, whereas the GPT-35 (Turbo) model only matched the expected answer (if there is enough info in the context to answer the question) 10 of 12 times. 
-Therefore, the Brier score of the GPT-4-2024-04-09 model is lower, which empirically shows it is more accurate in predicting the probability of estimating it has enough information to answer the provided question.
+Note the Brier scores below comparing GPT-4o and GPT-4o-mini models. The GPT-4o-mini model has a lower Brier score, which means it is more accurate in predicting the probability of the correct answer response. 
+In fact, the GPT-4o-mini correctly arrived at the final answer correctly 18 of the 20 questions, whereas the GPT-4o model matched the expected human answer (if there is enough info in the context to answer the question) 17 of 20 questions. 
+Therefore, the Brier score of the GPT-4o-mini model is lower, which empirically shows it is more accurate in quantifying the probability it has enough information to answer the provided question.
 
 Example Output:
 ![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-4o](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT-4o.png)  
