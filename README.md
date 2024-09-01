@@ -13,7 +13,7 @@
 ```javascript
 {
   "AzureOpenAI": {
-    "ModelDeploymentName": "gpt-4-2024-04-09", // Any Azure OpenAI GPT-4  or GPT3.5 model should perform well
+    "ModelDeploymentName": "gpt-4-2024-04-09", // Any Azure OpenAI GPT-4o-mini, GPT-4o or GPT3.5 model should perform well
     "APIKey": "YOURAZUREOPENAIKEY",
     "Endpoint": "https://YOURAZUREOPENAIENDPOINT.openai.azure.com/"
   }
