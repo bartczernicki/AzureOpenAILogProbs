@@ -69,8 +69,8 @@ namespace AzureOpenAILogProbs.Services
                 new Question{ Number = 16, EnoughInformationInProvidedContext = true, QuestionText = "Are the Mets current notable rivals the Phillies, Braves and the Yankees?" },
                 new Question{ Number = 17, EnoughInformationInProvidedContext = false, QuestionText = "Is the Atlanta Braves rivalry due to both geographic and division reasons?" },
                 new Question{ Number = 18, EnoughInformationInProvidedContext = true, QuestionText = "Do the Mets have a registered foundation?" },
-                new Question{ Number = 19, EnoughInformationInProvidedContext = false, QuestionText = "Is the New York Mets Foundation the only charity or foundation from the Mets?" },
-                new Question{ Number = 20, EnoughInformationInProvidedContext = false, QuestionText = "Do the Mets have a charity cause for the September 11th attacks and World War 2 veterans?" }
+                new Question{ Number = 19, EnoughInformationInProvidedContext = false, QuestionText = "Is the New York Mets Foundation the ONLY charity or foundation from the Mets?" },
+                new Question{ Number = 20, EnoughInformationInProvidedContext = false, QuestionText = "Do the Mets have a charity cause for both the September 11th attacks and World War 2 veterans?" }
             };
 
             return questions;

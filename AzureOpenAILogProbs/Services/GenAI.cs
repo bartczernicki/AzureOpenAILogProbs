@@ -35,14 +35,14 @@ namespace AzureOpenAILogProbs.Services
             if (typeOfResponse == "TrueFalse")
             {
                 promptOutput = """
-                    Your output should JUST be the Boolean true or false, if you have sufficient information in the Wikipedia article to answer the question.
+                    Your output should JUST be the Boolean true or false, if you have sufficient information in the Wikipedia article to answer the question; you are not answering the actual question.
                     Respond with just one word, the Boolean true or false. You must output the word 'True', or the word 'False', nothing else.
                     """;
             }
             else if (typeOfResponse == "ConfidenceScore")
             {
                 promptOutput = $"""
-                    Your output should JUST be the a single confidence score between 1 to 10, if you have sufficient information in the Wikipedia article to answer the question.
+                    Your output should JUST be the a single confidence score between 1 to 10, if you have sufficient information in the Wikipedia article to answer the question; you are not answering the actual question.
                     Respond with just one confidence score number between 1 to 10. You must output a single number, nothing else.
                     """;
             }
