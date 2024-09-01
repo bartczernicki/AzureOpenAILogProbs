@@ -72,13 +72,13 @@ Because the True or False are the first and only tokens in the response, the fir
    * Brier scores (and similar methods in Machine Learning & Statistics) are used to measure the accuracy of probabilistic predictions.
    * The lower the Brier Score, the better the model is at predicting the probability of the answer response.
    * It outputs a table of the Brier Scores for each of the questions and the average Brier Score for all the questions.
-   * Averaging Brier scores can tell us a great deal about the overall performance accuracy of the model. Average Brier Scores of 0.1 or lower are considered excellent, 0.1 - 0.2 are superior, 0.2 - 0.3 are adequate, and 0.3-0.35 are acceptable, and finally average Brier scores above 0.35 indicate poor prediction performance.  
+   * Averaging Brier scores can tell us a great deal about the overall performance accuracy of the probabilistic system or a probabilistic model. Average Brier Scores of 0.1 or lower are considered excellent, 0.1 - 0.2 are superior, 0.2 - 0.3 are adequate, and 0.3-0.35 are acceptable, and finally average Brier scores above 0.35 indicate poor prediction performance.  
 
 Brier scores will vary depending on the model capabilities, the prompt, and the context of the question. 
 By keeping the prompt and context the same, one can compare overall model accuracy performance. 
-Note the Brier scores below comparing GPT-4 and GPT-35 (Turbo) models. The GPT-4-20240409 model has a lower Brier score, which means it is more accurate in predicting the probability of the correct answer response. 
-In fact, the GPT-4-2024-04-09 correctly arrived at the final answer correctly 11 of the 12 times, whereas the GPT-35 (Turbo) model only matched the expected answer (if there is enough info in the context to answer the question) 10 of 12 times. 
-Therefore, the Brier score of the GPT-4-2024-04-09 model is lower, which empirically shows it is more accurate in predicting the probability of estimating it has enough information to answer the provided question.
+Note the Brier scores below comparing GPT-4o and GPT-4o-mini models. The GPT-4o-mini model has a lower Brier score, which means it is more accurate in predicting the probability of the correct answer response. 
+In fact, the GPT-4o-mini correctly arrived at the final answer correctly 18 of the 20 questions, whereas the GPT-4o model matched the expected human answer (if there is enough info in the context to answer the question) 17 of 20 questions. Note the average Brier score of GPT-4o-mini is 0.083 (below 0.1), which indicates excellent predictive performance. 
+Therefore, the Brier score of the GPT-4o-mini model is lower, empirically shows it is more accurate in quantifying the probability it has enough information to answer the provided question.  
 
 Example Output:
 ![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-4o](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT-4o.png)  
