@@ -52,25 +52,25 @@ namespace AzureOpenAILogProbs.Services
             var questions = new List<Question>
                 {
                 new Question{ Number = 1, EnoughInformationInProvidedContext = true, QuestionText = "When where the Mets founded?" },
-                new Question{ Number = 2, EnoughInformationInProvidedContext = true, QuestionText = "Are the Mets a baseball team?" },
+                new Question{ Number = 2, EnoughInformationInProvidedContext = true, QuestionText = "Are the Mets a baseball team or basketball team?" },
                 new Question{ Number = 3, EnoughInformationInProvidedContext = true, QuestionText = "Who owns the Mets?" },
                 new Question{ Number = 4, EnoughInformationInProvidedContext = false, QuestionText = "Have the Mets won the 2023 World Series?" },
                 new Question{ Number = 5, EnoughInformationInProvidedContext = false, QuestionText = "Who are the Boston Red Sox?" },
                 new Question{ Number = 6, EnoughInformationInProvidedContext = true, QuestionText = "Where the Mets were a bad team in the 1960s?" },
-                new Question{ Number = 7, EnoughInformationInProvidedContext = true, QuestionText = "Do the Mets uniforms include the colors blue and orange?" },
+                new Question{ Number = 7, EnoughInformationInProvidedContext = true, QuestionText = "Do the Mets uniforms include what to primary colors?" },
                 new Question{ Number = 8, EnoughInformationInProvidedContext = false, QuestionText = "Are the there only 2 colors on the Mets uniform?" },
                 new Question{ Number = 9, EnoughInformationInProvidedContext = false, QuestionText = "Do you think the Mets fans are happy with the Mets historical performance?" },
-                new Question{ Number = 10, EnoughInformationInProvidedContext = true, QuestionText = "Did the Mets have a winning season in their inaugural season of play?" },
-                new Question{ Number = 11, EnoughInformationInProvidedContext = false, QuestionText = "Has Steve Cohen been the longest-serving owner of the Mets?" },
-                new Question{ Number = 12, EnoughInformationInProvidedContext = true, QuestionText = "Is Mr. Met the official mascot of the New York Mets?" },
-                new Question{ Number = 13, EnoughInformationInProvidedContext = false, QuestionText = "Is Mr. Met the official mascot of the New York Yankees?" },
-                new Question{ Number = 14, EnoughInformationInProvidedContext = true, QuestionText = "Do the New York Mets have notable rivalries with three other baseball teams?" },
+                new Question{ Number = 10, EnoughInformationInProvidedContext = true, QuestionText = "What was the Mets record in their inaugural season of play?" },
+                new Question{ Number = 11, EnoughInformationInProvidedContext = false, QuestionText = "Who has been the longest-serving owner of the Mets?" },
+                new Question{ Number = 12, EnoughInformationInProvidedContext = true, QuestionText = "Who or what is the official mascot of the New York Mets?" },
+                new Question{ Number = 13, EnoughInformationInProvidedContext = false, QuestionText = "Who or what is the official mascot of the New York Yankees?" },
+                new Question{ Number = 14, EnoughInformationInProvidedContext = true, QuestionText = "Who are the three other baseball teams the New York Mets have notable rivalries with?" },
                 new Question{ Number = 15, EnoughInformationInProvidedContext = false, QuestionText = $"The current year is: {DateTime.Now.Year}. Do you have a current year of the New York Met's worth?" },
-                new Question{ Number = 16, EnoughInformationInProvidedContext = true, QuestionText = "Are the Mets current notable rivals the Phillies, Braves and the Yankees?" },
+                new Question{ Number = 16, EnoughInformationInProvidedContext = true, QuestionText = "The Mets current notable rivals the Phillies, Braves and which third team?" },
                 new Question{ Number = 17, EnoughInformationInProvidedContext = false, QuestionText = "Is the Atlanta Braves rivalry due to both geographic and division reasons?" },
-                new Question{ Number = 18, EnoughInformationInProvidedContext = true, QuestionText = "Do the Mets have a registered foundation?" },
-                new Question{ Number = 19, EnoughInformationInProvidedContext = false, QuestionText = "Is the New York Mets Foundation the ONLY charity or foundation from the Mets?" },
-                new Question{ Number = 20, EnoughInformationInProvidedContext = false, QuestionText = "Do the Mets have a charity cause for both the September 11th attacks and World War 2 veterans?" }
+                new Question{ Number = 18, EnoughInformationInProvidedContext = true, QuestionText = "What is the Mets registered foundation's name?" },
+                new Question{ Number = 19, EnoughInformationInProvidedContext = false, QuestionText = "What are the names of the Mets two foundations?" },
+                new Question{ Number = 20, EnoughInformationInProvidedContext = false, QuestionText = "What is the Mets charity for both World War 2 veterans and September 11th attacks?" }
             };
 
             return questions;
