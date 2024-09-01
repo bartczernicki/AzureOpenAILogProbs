@@ -137,23 +137,7 @@ namespace AzureOpenAILogProbs
                     {
                         var randomSeed = randomGenerator.Next(1, 100000000);
 
-                        var promptInstructionsTrueFalse = $"""
-                        Random Seed: {randomSeed}
-                        Using this WIKIPEDIA ARTICLE as the ONLY source of information: 
-                        --START OF WIKIPEDIA ARTICLE--
-                        {sampleWikipediaArticle}
-                        -- END OF WIKIPEDIA ARTICLE--
-                        The question is: 
-                        -- START OF QUESTION--
-                        {question.QuestionText}
-                        -- END OF QUESTION--
-                        INSTRUCTIONS: 
-                        Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
-                        Do not hallucinate. Do not make up factual information.
-                        Your output should JUST be the Boolean true or false, if you have sufficient information in the Wikipedia article to answer the question.
-                        Respond with just one word, the Boolean true or false. You must output the word 'True', or the word 'False', nothing else.
-                        """;
-
+                        var promptInstructionsTrueFalse = Services.GenAI.GetPromptInstructions(sampleWikipediaArticle, question, "TrueFalse");
 
                         var chatCompletionsOptionsTrueFalse = GenAI.GetChatCompletionOptions(OPENAITEMPATURE, false);
                         var chatMessages = GenAI.BuildChatMessageHistory(promptInstructionsTrueFalse);
@@ -219,7 +203,7 @@ namespace AzureOpenAILogProbs
                         Console.WriteLine("""
                         Note:
                         Lower Brier Scores are better, closer to 0.0 is ideal. Higher Brier Scores are worse, closer to 1.0 is bad.
-                        Average Brier Scores of 0.1 or lower are considered excellent, 0.1-0.2 are superior, 0.2-0.3 are adequate, 
+                        Average Brier Scores of 0.1 or lower are considered excellent, 0.1 - 0.2 are superior, 0.2 - 0.3 are adequate, 
                         and 0.2-0.35 are acceptable, and finally average Brier scores above 0.35 illustrate the overall model performance is poor.
                         """);
                     }
@@ -230,27 +214,9 @@ namespace AzureOpenAILogProbs
                     // https://cookbook.openai.com/examples/using_logprobs
 
 
-                    // random.Next(1, 10000000);
-
                     foreach (var question in questions)
                     {
-                        var randomSeed = randomGenerator.Next(1, 100000000);
-
-                        var promptInstructionsConfidenceScore = $"""
-                        Random Seed: { randomSeed}
-
-                        Using this Wikipedia Article as the ONLY source of information: 
-                        --START OF WIKIPEDIA ARTICLE--
-                        {sampleWikipediaArticle}
-                        -- END OF WIKIPEDIA ARTICLE--
-                        The question is: 
-                        -- START OF QUESTION--
-                        {question.QuestionText}
-                        -- END OF QUESTION--
-                        INSTRUCTIONS: Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
-                        Your output should JUST be the a single confidence score between 1 to 10, if you have sufficient information in the Wikipedia article to answer the question.
-                        Respond with just one confidence score number between 1 to 10. You must output a single number, nothing else.
-                        """;
+                        var promptInstructionsConfidenceScore = Services.GenAI.GetPromptInstructions(sampleWikipediaArticle, question, "ConfidenceScore");
 
                         var chatMessages = GenAI.BuildChatMessageHistory(promptInstructionsConfidenceScore);
 
@@ -317,13 +283,13 @@ namespace AzureOpenAILogProbs
                 else if (selectedProcessingChoice == ProcessingOptions.ConfidenceInterval)
                 {
                     // On this run, we will use a single question but run it multiple times to calculate the Confidence Interval
-                    var question = "Has Steve Cohen been the longest-serving owner of the Mets?";
-                    // var question = questions.Where(a => a.Number == 17).FirstOrDefault()!.QuestionText;
+                    //var question = "Has Steve Cohen been the longest-serving owner of the Mets?";
+                    var question = questions.Where(a => a.Number == 17).FirstOrDefault();
 
                     // 1) Write the Question to the console
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine();
-                    Console.WriteLine(question);
+                    Console.WriteLine(question!.QuestionText);
                     Console.ResetColor();
 
                     // 2) Set up the prompt instructions and configuration for the Confidence Interval, it will be used for the loop
@@ -333,25 +299,7 @@ namespace AzureOpenAILogProbs
 
                     for (int i = 0; i != 10; i++)
                     {
-                        var randomSeed = randomGenerator.Next(1, 100000000);
-
-                        var promptInstructionsConfidenceScore = $"""
-                        Random Seed: {randomSeed}
-                        Using this Wikipedia Article as the ONLY source of information: 
-                        --START OF WIKIPEDIA ARTICLE--
-                        {sampleWikipediaArticle}
-                        -- END OF WIKIPEDIA ARTICLE--
-                        The question is: 
-                        -- START OF QUESTION--
-                        {question}
-                        -- END OF QUESTION--
-                        INSTRUCTIONS: 
-                        Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
-                        Do not hallucinate. Do not make up factual information.
-                        Your output should JUST be the a single confidence score between 1 to 10, if you have sufficient information in the Wikipedia article to answer the question.
-                        Respond with just one confidence score number between 1 to 10. You must output a single number, nothing else.
-                        """;
-
+                        var promptInstructionsConfidenceScore = Services.GenAI.GetPromptInstructions(sampleWikipediaArticle, question, "ConfidenceScore");
                         var chatMessages = GenAI.BuildChatMessageHistory(promptInstructionsConfidenceScore);
 
                         // Get new chat client
