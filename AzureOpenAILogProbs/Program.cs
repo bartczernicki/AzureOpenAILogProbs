@@ -64,6 +64,8 @@ namespace AzureOpenAILogProbs
 
                 // Set the LLM Temperature
                 const float OPENAITEMPATURE = 0.3f; // Max value 2. Very direct and instructive prompts will negate temperature.
+                // When running Option #4...
+                // To simulate more variance in selecting lower probability tokens, increase the temperature to between 1.4 - 2.0.
 
                 // Create a random number generator to prevent KV-Cache re-use
                 var randomGenerator = new Random();
