@@ -13,7 +13,7 @@
 ```javascript
 {
   "AzureOpenAI": {
-    "ModelDeploymentName": "gpt-4-2024-04-09", // Any Azure OpenAI GPT-4  or GPT3.5 model should perform well
+    "ModelDeploymentName": "gpt-4-2024-04-09", // Any Azure OpenAI GPT-4o-mini, GPT-4o or GPT3.5 model should perform well
     "APIKey": "YOURAZUREOPENAIKEY",
     "Endpoint": "https://YOURAZUREOPENAIENDPOINT.openai.azure.com/"
   }
@@ -72,7 +72,7 @@ Because the True or False are the first and only tokens in the response, the fir
    * Brier scores (and similar methods in Machine Learning & Statistics) are used to measure the accuracy of probabilistic predictions.
    * The lower the Brier Score, the better the model is at predicting the probability of the answer response.
    * It outputs a table of the Brier Scores for each of the questions and the average Brier Score for all the questions.
-   * Averaging Brier scores can tell us a great deal about the overall performance accuracy of the model. Average Brier Scores of 0.1 or lower are considered excellent, 0.1-0.2 are superior, 0.2-0.3 are adequate, and 0.2-0.35 are acceptable, and finally average Brier scores above 0.35 illustrate the overall model performance is poor.
+   * Averaging Brier scores can tell us a great deal about the overall performance accuracy of the model. Average Brier Scores of 0.1 or lower are considered excellent, 0.1 - 0.2 are superior, 0.2 - 0.3 are adequate, and 0.3-0.35 are acceptable, and finally average Brier scores above 0.35 indicate poor prediction performance.  
 
 Brier scores will vary depending on the model capabilities, the prompt, and the context of the question. 
 By keeping the prompt and context the same, one can compare overall model accuracy performance. 
@@ -81,9 +81,9 @@ In fact, the GPT-4-2024-04-09 correctly arrived at the final answer correctly 11
 Therefore, the Brier score of the GPT-4-2024-04-09 model is lower, which empirically shows it is more accurate in predicting the probability of estimating it has enough information to answer the provided question.
 
 Example Output:
-![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-4](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT4-Turbo-20240409.png)  
+![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-4o](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT-4o.png)  
 
-![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-35](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT35-Turbo-0125.png)  
+![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-4o-mini](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT-4o-mini.png)  
 
 
 ### 3) Weighted Probability of Confidence Score - Model provides a self-confidence score and then assess the probability of the confidence score
