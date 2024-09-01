@@ -69,8 +69,8 @@ namespace AzureOpenAILogProbs
 
                 Uri azureOpenAIResourceUri = new(azureOpenAIEndpoint!);
                 AzureKeyCredential azureKeyCredential = new(azureOpenAIAPIKey!);
-
-                // Info: https://github.com/Azure/azure-sdk-for-net/tree/Azure.AI.OpenAI_1.0.0-beta.16/sdk/openai/Azure.AI.OpenAI 
+                
+                // Info: https://github.com/openai/openai-dotnet
                 var client = new AzureOpenAIClient(azureOpenAIResourceUri, azureKeyCredential, azureOpenAIClientOptions);
                 var modelDeploymentName = azureModelDeploymentName;
              
@@ -127,7 +127,7 @@ namespace AzureOpenAILogProbs
                     foreach (var question in questions)
                     {
                         var promptInstructionsTrueFalse = $"""
-                        Using this Wikipedia Article as the ONLY source of information: 
+                        Using this WIKIPEDIA ARTICLE as the ONLY source of information: 
                         --START OF WIKIPEDIA ARTICLE--
                         {sampleWikipediaArticle}
                         -- END OF WIKIPEDIA ARTICLE--
@@ -137,27 +137,20 @@ namespace AzureOpenAILogProbs
                         -- END OF QUESTION--
                         INSTRUCTIONS: 
                         Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
+                        Do not hallucinate. Do not make up factual information.
                         Your output should JUST be the Boolean true or false, if you have sufficient information in the Wikipedia article to answer the question.
                         Respond with just one word, the Boolean true or false. You must output the word 'True', or the word 'False', nothing else.
                         """;
 
 
                         var chatCompletionsOptionsTrueFalse = GenAI.GetChatCompletionOptions(0.0f, false);
-
-                        //var systemChatMessage = new SystemChatMessage("You are an assistant testing large language model features. Follow the instructions provided in the prompt.");
-                        //var userChatMessage = new UserChatMessage(promptInstructionsTrueFalse);
-
-                        //var chatMessages = new List<ChatMessage>();
-                        //chatMessages.Add(systemChatMessage);
-                        //chatMessages.Add(userChatMessage);
-
                         var chatMessages = GenAI.BuildChatMessageHistory(promptInstructionsTrueFalse);
 
                         // Get new chat client
                         var chatClient = client.GetChatClient(modelDeploymentName);
 
                         var response = await chatClient.CompleteChatAsync(chatMessages, chatCompletionsOptionsTrueFalse);
-                        var responseValueContent = response.Value.Content.ToString();
+                        var llmResponse = response.Value.Content.FirstOrDefault()!.ToString();
 
                         // 1) Write the Question to the console
                         Console.ForegroundColor = ConsoleColor.Yellow;
@@ -167,37 +160,37 @@ namespace AzureOpenAILogProbs
 
                         // 2) True/False Question - Raw answers to the console
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine($"[Human Expected LLMAnswer (Enough Information) - True/False]: {question.EnoughInformationInProvidedContext}");
-                        Console.WriteLine($"[LLM {response.Value.Role.ToString().ToUpperInvariant()} (Enough Information) - True/False]: {responseValueContent}");
+                        Console.WriteLine($"[Human Expected Answer (Q: Is There Enough Information) - True/False]: {question.EnoughInformationInProvidedContext}");
+                        Console.WriteLine($"[LLM {response.Value.Role.ToString().ToUpperInvariant()}  Answer (Q: Is There Enough Information) - True/False]: {llmResponse}");
 
-                        
-                        // 3) True/False Question - LLMAnswer Details
-                        // https://stackoverflow.com/questions/48465737/how-to-convert-log-probability-into-simple-probability-between-0-and-1-values-us
-                        var logProbsTrueFalse = response.Value.ContentTokenLogProbabilities.Select(a => a.Token + " | Probability of First Token (LLM Probability of having enough info for question): " + Math.Round(Math.Exp(a.LogProbability), 8));
+                        // 3) True/False Question - LLMAnswer Probability Details
+                        // More Info: https://stackoverflow.com/questions/48465737/how-to-convert-log-probability-into-simple-probability-between-0-and-1-values-us
                         var probability = Math.Round(Math.Exp(response.Value.ContentTokenLogProbabilities[0].LogProbability), 8);
-                        // Write out the first token probability
-                        foreach (var logProb in logProbsTrueFalse)
-                        {
-                            Console.WriteLine($"True/False LLMAnswer: {logProb}");
-                        }
+                        var llmProbsMessage = $"Probability of First Token (Calculated LLM ASSISTANT Probability of Given Answer): {probability}";
+                        Console.WriteLine(llmProbsMessage);
 
+                        // 4) Calculate if expected human and LLM answers match
                         // convert responseMessageTrueFalse.Content to bool
-                        var responseTrueFalseBool = responseValueContent == "True";
+                        var llmResponseBool = (bool.Parse(llmResponse));
+                        var doesLLMAnswerMatchHumanExpectedAnswer = (llmResponseBool == question.EnoughInformationInProvidedContext);
+                        var doAnswersMatchMessage = $"Does expected human and LLM answers match: {doesLLMAnswerMatchHumanExpectedAnswer}";
+                        Console.WriteLine(doAnswersMatchMessage);
+
                         if (selectedProcessingChoice == ProcessingOptions.FirstTokenProbabilityWithBrierScore)
                         {
-                            var responseText = response.Value.Content[0].Text;
                             questionAnswers.Add(new QuestionAnswer
                             {
                                 Number = question.Number,
-                                LLMAnswer = bool.Parse(responseText),
+                                LLMAnswer = llmResponseBool,
                                 ExpectedAnswer = question.EnoughInformationInProvidedContext,
-                                DoesLLMAnswerMatchExpectedAnswer = (bool.Parse(responseText) == question.EnoughInformationInProvidedContext),
+                                DoesLLMAnswerMatchExpectedAnswer = doesLLMAnswerMatchHumanExpectedAnswer,
                                 AnswerProbability = probability
                             });
                         }
+
                     } // end of foreach question loop
                     
-                    // Add Brier Score Information
+                    // Add Brier Score Information to Console
                     if (selectedProcessingChoice == ProcessingOptions.FirstTokenProbabilityWithBrierScore)
                     {
                         // Show the Brier Score for the answers in a table
@@ -208,8 +201,15 @@ namespace AzureOpenAILogProbs
                         Console.WriteLine($"| CALCULATED BRIER SCORES FOR: {modelDeploymentName!.ToUpper()}");
                         Console.WriteLine($"|-----------------------------");
                         consoleTable.Write(Format.Minimal);
-                        Console.WriteLine($" Average Brier Score for sample questions: {Math.Round(questionAnswers.Select(a => a.BrierScore).Average(), 6)}");
+                        Console.WriteLine($"Average Brier Score for sample questions: {Math.Round(questionAnswers.Select(a => a.BrierScore).Average(), 6)}");
+                        Console.WriteLine(string.Empty);
                         Console.ResetColor();
+                        Console.WriteLine("""
+                        Note:
+                        Lower Brier Scores are better, closer to 0.0 is ideal. Higher Brier Scores are worse, closer to 1.0 is bad.
+                        Average Brier Scores of 0.1 or lower are considered excellent, 0.1-0.2 are superior, 0.2-0.3 are adequate, 
+                        and 0.2-0.35 are acceptable, and finally average Brier scores above 0.35 illustrate the overall model performance is poor.
+                        """);
                     }
                 }
                 else if (selectedProcessingChoice == ProcessingOptions.WeightedProbability)
@@ -254,7 +254,7 @@ namespace AzureOpenAILogProbs
 
                         // 2) Confidence Score Question - Raw answers to the console
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine($"[Human Expected LLMAnswer (Enough Information) - True/False]: {question.EnoughInformationInProvidedContext}");
+                        Console.WriteLine($"[Human Expected Answer (Enough Information) - True/False]: {question.EnoughInformationInProvidedContext}");
                         Console.WriteLine($"[LLM {response.Value.Role.ToString().ToUpperInvariant()} (Enough Information) - Confidence Score]: {response.Value.Content[0].Text}");
 
                         // 3) Confidence Score Question - Process the Confidence Score answer details
