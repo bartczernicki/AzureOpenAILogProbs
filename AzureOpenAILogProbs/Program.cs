@@ -283,8 +283,7 @@ namespace AzureOpenAILogProbs
                 else if (selectedProcessingChoice == ProcessingOptions.ConfidenceInterval)
                 {
                     // On this run, we will use a single question but run it multiple times to calculate the Confidence Interval
-                    //var question = "Has Steve Cohen been the longest-serving owner of the Mets?";
-                    var question = questions.Where(a => a.Number == 17).FirstOrDefault();
+                    var question = questions.Where(a => a.Number == 19).FirstOrDefault();
 
                     // 1) Write the Question to the console
                     Console.ForegroundColor = ConsoleColor.Yellow;

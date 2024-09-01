@@ -17,7 +17,11 @@ namespace AzureOpenAILogProbs.Services
 
         public static string GetPromptInstructions(string sampleWikipediaArticle, Question question, string typeOfResponse)
         {
+            // Random seed to prevent KV-Cache from returning the same cached response
+            var randomSeed = new Random().Next(0, 1000000);
+
             var promptInstructionsBase = $"""
+                Random Seed: {randomSeed}
                 Using this WIKIPEDIA ARTICLE as the ONLY source of information: 
                 --START OF WIKIPEDIA ARTICLE--
                 {sampleWikipediaArticle}
