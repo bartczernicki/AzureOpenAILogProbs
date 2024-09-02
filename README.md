@@ -35,6 +35,11 @@ dotnet run
 
 ### Key Info About Solution  
 
+There are 20 question and answer pairs provided. Each item in the list has has a question about the Wikipedia article paired with a human assessment True/False, if there is enough information in the provided Wikipedia article to answer the question. Each question will be sent to the LLM and then the LLMs assessment if it has sufficient information to answer the question will be compared to the human assessment. Two examples from the list of 20 questions: 
+```csharp
+new Question{ Number = 1, EnoughInformationInProvidedContext = true, QuestionText = "When where the Mets founded?" },
+new Question{ Number = 2, EnoughInformationInProvidedContext = true, QuestionText = "Are the Mets a baseball team or basketball team?" },
+```
 
 The ability to inspect token log probabilities is turned off by default. To enable this feature, you need to set the IncludeLogProbabilities to true. This does not cost any extra tokens nor make the API calls cost more money. However, this very slightly increases the payload of the JSON object coming back. For example, using the new OpenAI .NET library it is exposed as a property.  
 ```csharp
