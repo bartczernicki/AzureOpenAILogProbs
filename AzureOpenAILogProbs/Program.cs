@@ -164,7 +164,7 @@ namespace AzureOpenAILogProbs
                         // convert responseMessageTrueFalse.Content to bool
                         var llmResponseBool = (bool.Parse(llmResponse));
                         var doesLLMAnswerMatchHumanExpectedAnswer = (llmResponseBool == question.EnoughInformationInProvidedContext);
-                        var doAnswersMatchMessage = $"Does expected human and LLM answers match: {doesLLMAnswerMatchHumanExpectedAnswer}";
+                        var doAnswersMatchMessage = $"Does the expected human and LLM answer match: {doesLLMAnswerMatchHumanExpectedAnswer}";
                         Console.WriteLine(doAnswersMatchMessage);
 
                         if (selectedProcessingChoice == ProcessingOptions.FirstTokenProbabilityWithBrierScore)
