@@ -37,7 +37,7 @@ Each next token that is considered for output is calculated through an internal 
 Based on configurations (temperature, top_p etc.) these probabilities can be set and then the LLM selects the next "best token" based on the different configurations. 
 Because these LLMs are probabilistic in nature, this is why you may see different tokens output for the same prompt instruction sent to the LLM. 
 Below is an example of a question and answer and the associated probabilities for the two tokens (words) that were selected to answer the question: "Who was the first president of the United States?". 
-In the example below the model output the answer "George Washington", using the token probabilities of 99.62% and 99.99%.  
+In the example below the model answered with two tokens "George" "Washington", using the token probabilities of 99.62% and 99.99%.  
 
 ![Azure LogProbs Example](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-Example.png)
 
