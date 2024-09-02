@@ -42,23 +42,31 @@ dotnet run
 
 In this setup, the LLM will be provided with selected paragraphs from a Wikipedia article on the New York Mets baseball team. The full article can be located here: https://en.wikipedia.org/wiki/New_York_Mets. This is the context (grounding information) that will always be provided in each prompt.  
 
-In addition, there are 20 question and answer pairs provided. Each item in the list has has a question about the Mets Wikipedia article paired with a human assessment True/False, if there is enough information in the provided Wikipedia article to answer the question. Each question will be sent to the LLM and then the LLM will assess if it has sufficient information to answer the question will be compared to the human assessment. Two examples from the list of 20 questions: 
+In addition, there are 20 question and answer pairs provided. Each item in the list has has a question about the Mets Wikipedia article paired with a human assessment True/False, if there is enough information in the provided Wikipedia article to answer the question. Each question will be sent to the LLM and then the LLM will assess if it has sufficient information to answer the question. That answer will be compared to the human assessment (logical truth). Two examples from the list of 20 questions: 
 ```csharp
 new Question{ Number = 1, EnoughInformationInProvidedContext = true, QuestionText = "When where the Mets founded?" },
 new Question{ Number = 2, EnoughInformationInProvidedContext = true, QuestionText = "Are the Mets a baseball team or basketball team?" },
 ```
 
-The ability to inspect token log probabilities is turned off by default. To enable this feature, you need to set the IncludeLogProbabilities to true. This does not cost any extra tokens nor make the API calls cost more money. However, this very slightly increases the payload of the JSON object coming back. For example, using the new OpenAI .NET library it is exposed as a property on the ChatCompletionOptions class.  
+The ability to inspect token log probabilities is turned off by default. To enable this feature, the **IncludeLogProbabilities** property should be set to true. This does not cost any extra tokens nor make the API calls cost more money. However, this very slightly increases the payload of the JSON object coming back. For example, using the new OpenAI .NET library it is exposed as a property on the ChatCompletionOptions class.  
 ```csharp
 chatCompletionOptions.IncludeLogProbabilities = true;
 ```
 
-Inlcuded is also the ability to control how many token log probabilities are returned with each API call. This provides an array/List of tokens with each respective probability. In statistics, this is known as a Probability Mass Function (PMF) as it a discrete distribution of probabilities. Note: On Azure OpenAI, this has a current maximum of 5 and on OpenAI 10 (for most APIs). For example, using the new OpenAI .NET library it is exposed as a property on the ChatCompletionOptions class.  
+Inlcuded in the .NET library is the ability to control the number of log probabilities returned with each API call. This provides an array/List of tokens with each respective probability. In statistics, this is known as a Probability Mass Function (PMF) as it a discrete distribution of probabilities. Note: On Azure OpenAI, this has a current maximum of 5 and on OpenAI 10 (for most APIs). For example, using the new OpenAI .NET library it is exposed as a property on the ChatCompletionOptions class.  
 ```csharp
 chatCompletionOptions.TopLogProbabilityCount = 5;
 ```
 
-That is basically the core setup of this solution. The rest of the code is C# code to wire up the input/output of the services and ensure that the calculations are properly performed and visualized in the console application.  
+The solution also includes the ability to set the **Temperature** of each of the expected outputs from the (LLM) model. The default is 0.3f (floating point number), but can be increased to 2f for more creativity and variance.  
+```csharp
+internal static class GenAI
+{
+    // To simulate more variance in selecting lower probability tokens, increase the temperature to between 1.4 - 2.0.
+    public const float OPENAITEMPATURE = 0.3f; 
+```
+
+That is essentially the core setup of this solution. The rest of the code is C# code to wire up the input/output of the services and ensure that the calculations are properly performed and visualized in the console application.  
 
 
 ## Background Information on Log Probabilities  
