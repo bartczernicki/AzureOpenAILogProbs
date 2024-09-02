@@ -25,7 +25,13 @@ git clone https://github.com/bartczernicki/AzureOpenAILogProbs.git
     "Endpoint": "https://YOURAZUREOPENAIENDPOINT.openai.azure.com/"
   }
 }
-```  
+```
+
+### Build and Run (Can build or Debug from Visual Studio)
+```
+dotnet build
+dotnet run
+```
 
 ### Key Info About Solution  
 
