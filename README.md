@@ -63,7 +63,8 @@ The solution also includes the ability to set the **Temperature** of each of the
 internal static class GenAI
 {
     // To simulate more variance in selecting lower probability tokens, increase the temperature to between 1.4 - 2.0.
-    public const float OPENAITEMPATURE = 0.3f; 
+    public const float OPENAITEMPATURE = 0.3f;
+    ...
 ```
 
 That is essentially the core setup of this solution. The rest of the code is C# code to wire up the input/output of the services and ensure that the calculations are properly performed and visualized in the console application.  
