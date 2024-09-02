@@ -39,9 +39,9 @@ dotnet run
 
 ### Key Info About Solution Setup
 
-In this setup, the LLM will be provided with selected paragraphs from a Wikipedia article on the New York Mets. The full article can be located here: https://en.wikipedia.org/wiki/New_York_Mets.  
+In this setup, the LLM will be provided with selected paragraphs from a Wikipedia article on the New York Mets baseball team. The full article can be located here: https://en.wikipedia.org/wiki/New_York_Mets. This is the context (grounding information) that will always be provided in each prompt.  
 
-There are 20 question and answer pairs provided. Each item in the list has has a question about the Wikipedia article paired with a human assessment True/False, if there is enough information in the provided Wikipedia article to answer the question. Each question will be sent to the LLM and then the LLMs assessment if it has sufficient information to answer the question will be compared to the human assessment. Two examples from the list of 20 questions: 
+In addition, there are 20 question and answer pairs provided. Each item in the list has has a question about the Mets Wikipedia article paired with a human assessment True/False, if there is enough information in the provided Wikipedia article to answer the question. Each question will be sent to the LLM and then the LLM will assess if it has sufficient information to answer the question will be compared to the human assessment. Two examples from the list of 20 questions: 
 ```csharp
 new Question{ Number = 1, EnoughInformationInProvidedContext = true, QuestionText = "When where the Mets founded?" },
 new Question{ Number = 2, EnoughInformationInProvidedContext = true, QuestionText = "Are the Mets a baseball team or basketball team?" },
@@ -52,7 +52,7 @@ The ability to inspect token log probabilities is turned off by default. To enab
 chatCompletionOptions.IncludeLogProbabilities = true;
 ```
 
-You can also control how many token log probabilities are returned with each API call. This provides an array/List of tokens with each respective probability. In statistics, this is known as a Probability Mass Function (PMF) as it a discrete distribution of probabilities. Note: On Azure OpenAI, this has a current maximum of 5 and on OpenAI 10 (for most APIs). For example, using the new OpenAI .NET library it is exposed as a property.  
+Inlcuded is also the ability to control how many token log probabilities are returned with each API call. This provides an array/List of tokens with each respective probability. In statistics, this is known as a Probability Mass Function (PMF) as it a discrete distribution of probabilities. Note: On Azure OpenAI, this has a current maximum of 5 and on OpenAI 10 (for most APIs). For example, using the new OpenAI .NET library it is exposed as a property.  
 ```csharp
 chatCompletionOptions.TopLogProbabilityCount = 5;
 ```
