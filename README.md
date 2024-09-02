@@ -72,12 +72,20 @@ Need more info? Recommended Reading on the background of Azure OpenAI LogProbs:
    * OpenAI Cookbook - LogProbs: https://cookbook.openai.com/examples/using_logprobs  
    * What are LogProbs?: https://www.ignorance.ai/p/what-are-logprobs  
 
-There are several emerging techniques that use multiple calls to a model or several models to arrive at a response, conclusion or a quality decision. Currently, most ways LLMs are used in GenAI production systems is with grounding (RAG) by providing additional contextual information. The model is asked to answer a question, reason over that information etc. However, with poor grounding, this can result in poor results.  
+## Using LogProbs for Improving GenAI Quality
 
-Azure OpenAI LogProbs are a tool that can help and be used to gauge the confidence (probability) of the model's response.
+There are various proven and emering techniques that use multiple calls to a model or several models to arrive at a response, conclusion or a quality decision. Currently, most ways LLMs are used in GenAI production systems is with grounding (RAG) by providing additional contextual information. The model is instructed to answer a question, reason over that information etc. However, with poor grounding techniques, this can result in lower quality results.  
+
+Azure OpenAI LogProbs are an advanced technique that can help and be used to gauge the confidence (probability) of the model's response.
 This tremendous capability can empower the AI system to self-correct or guide the user/agent to arrive at a better response.
 In the set of examples below, we will simulate a parallel call to the model to gauge the confidence the model has with the presented context and question.
-This is illustrated below with the diagram:  
+
+This is illustrated below with the diagram. Notice that there are two paths (left and right):  
+* The left path is the traditional path most GenAI applications follow. You ask a question and receive a response from an LLM. This is typical workflow on the left is what one will find in most Chat applications.
+* The right path is a **"quality enhacement"** to the workflow. In parallel, one can ask the LLM **"LLM, do you have enough information to answer this question and how sure are you there enough information?"**! Notice from the diagram below with this **"quality enhancement"** now includes:
+    1) The answer to the question  
+    2) Estimate if there is enough information to answer the question  
+    3) Probability of the estimate if there is enough information to answer the question, which can be used for additiona calculations or decision threshholding  
 
 ![Azure LogProbs Workflow](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-LogProbsWorkflow.png)  
 
