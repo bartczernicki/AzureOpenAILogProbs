@@ -74,17 +74,16 @@ Need more info? Recommended Reading on the background of Azure OpenAI LogProbs:
 
 ## Using LogProbs for Improving GenAI Quality
 
-There are various proven and emering techniques that use multiple calls to a model or several models to arrive at a response, conclusion or a quality decision. Currently, most ways LLMs are used in GenAI production systems is with grounding (RAG) by providing additional contextual information. The model is instructed to answer a question, reason over that information etc. However, with poor grounding techniques, this can result in lower quality results.  
+There are various proven and new improving techniques that use multiple calls to a model or several models to arrive at a response, conclusion or a quality decision. Currently, most ways LLMs are used in GenAI production systems is with grounding (RAG) by providing additional contextual information. The (LLM) model is instructed to answer a question, reason over that information etc. However, with poor grounding techniques, this can result in lower quality results.  
 
-Azure OpenAI LogProbs are an advanced technique that can help and be used to gauge the confidence (probability) of the model's response.
-This tremendous capability can empower the AI system to self-correct or guide the user/agent to arrive at a better response.
-In the set of examples below, we will simulate a parallel call to the model to gauge the confidence the model has with the presented context and question.
+Azure OpenAI LogProbs are an advanced technique that can help and be can utilized to gauge the confidence (probability) of the model's response.
+This tremendous capability can empower the GenAI system to self-correct or guide the user/agent to arrive at an improved quality response.
 
-This is illustrated below with the diagram of the GenAI workflow. Notice that there are two paths (left and right):  
-* The left path is the traditional path most GenAI applications follow. You ask a question and receive a response from an LLM. This typical workflow on the left is what one will find in most current GenAI Chat applications.
-* The right path is a **"quality enhacement"** to the workflow. In parallel, one can ask the LLM "LLM, do you have enough information to answer this question and how sure are you there enough information?"! Notice from the diagram below with this "quality enhancement" now includes:
+The power of LogProbs is illustrated below with the diagram of the GenAI workflow. Notice that there are two paths (left and right):  
+* The left path is the traditional path most GenAI applications follow. You ask a question and receive a response from an LLM. This typical workflow on the left is what one will find in most current GenAI Chat applications.  
+* The right path is a **"quality enhacement"** to the workflow. In parallel, one can ask the LLM "LLM, do you have enough information to answer this question and how sure are you there enough information?"! Notice from the diagram below with this "quality enhancement" now includes:  
     1) **Answer** to the question  
-    2) **Does the Model Have Enough Information to Answer the Question** - True or False estime from the LLM
+    2) **Does the Model Have Enough Information to Answer the Question** - True or False estimate from the (LLM) model  
     3) **Probability of Having Enough Information to Answer the Question** - Calculated from LogProbs; which can be used for additional statistical inference or decision threshholding  
 
 ![Azure LogProbs Workflow](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-LogProbsWorkflow.png)  
@@ -93,10 +92,11 @@ This is illustrated below with the diagram of the GenAI workflow. Notice that th
 ## Console Processing Options  
 
 ### 1) First Token Probability - How Confident is the AI (LLM) Model with the information to answer the question  
-   * Uses the Azure OpenAI LogProbs to determine the probability of only the first token in the response.
-   * If the probability is high, it is likely the model has enough information (RAG context) to answer the question.  
-   * If the probability is low, it is likely the model does not have enough information (RAG context) to answer the question.  
-   * The probability can be used as a classification decision threshold of whether the model has enough information (RAG context) to answer the question.     
+   * The (LLM) model will respond with only either **True** or **False**. The model will basically classify (True or False) if it thinks there is enough information (True) or not enough information (False) in the provided Wikipedia grounding to answer the question in the prompt.
+   * Uses the Azure OpenAI LogProbs to determine the probability of only the first token in the response. The first token will always be either **True** or **False**.
+   * If the probability is high, the (LLM) model is very confident in it's own answer (True or False)  
+   * If the probability is low, the (LLM) model is not very confident in it's own answer (True or False)  
+   * The probability can be used as a classification decision threshold of whether the model has enough information (RAG context) to answer the question. For example, one can provide a user experience with a verified signal that the answer has passed through a second validation when the emitted probability from the model (LLM) is over 90%.
 
 Example Output:
 ![Azure OpenAI Log Probs - First Token Prob](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-FirstTokenProbability.png)  
