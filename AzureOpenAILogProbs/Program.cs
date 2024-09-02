@@ -121,8 +121,6 @@ namespace AzureOpenAILogProbs
 
                     foreach (var question in questions)
                     {
-                        var randomSeed = randomGenerator.Next(1, 100000000);
-
                         var promptInstructionsTrueFalse = Services.GenAI.GetPromptInstructions(sampleWikipediaArticle, question, "TrueFalse");
 
                         var chatCompletionsOptionsTrueFalse = GenAI.GetChatCompletionOptions(GenAI.OPENAITEMPATURE, false);

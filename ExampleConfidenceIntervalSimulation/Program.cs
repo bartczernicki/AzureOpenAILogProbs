@@ -9,7 +9,7 @@
             // This is what the AI model claims the confidence is for the various questions
             const int CLAIMEDCONFIDENCEOFAIMODEL = 80; // 80% confidence
 
-            Console.WriteLine($"Simulating {NUMBEROFSIMULATIONS:n0} iterations with a claimed AI LLM Model confidence of {CLAIMEDCONFIDENCEOFAIMODEL}%");
+            Console.WriteLine($"Simulating {NUMBEROFSIMULATIONS:n0} iterations with a claimed AI LLM Model confidence of {CLAIMEDCONFIDENCEOFAIMODEL}% for 100 questions");
 
             var random = new Random();  // Add seed for reproducibility
             var bootstrapConfidenceScores = new List<double>();
