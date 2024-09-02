@@ -1,16 +1,11 @@
 ﻿using Azure;
 using Azure.AI.OpenAI;
-using Azure.Core;
-using Azure.Core.Pipeline;
 using AzureOpenAILogProbs.DTOs;
 using AzureOpenAILogProbs.Services;
 using ConsoleTables;
 using MathNet.Numerics.Statistics;
 using Microsoft.Extensions.Configuration;
-using OpenAI;
-using OpenAI.Chat;
 using System.ClientModel.Primitives;
-using System.Runtime.CompilerServices;
 
 namespace AzureOpenAILogProbs
 {
@@ -124,7 +119,7 @@ namespace AzureOpenAILogProbs
                 // Note: The questions are a mix of True/False questions and highly dependent on the sample Wikipedia article above (Mets)
                 var questions = Services.Questions.GetQuestions();
 
-                // Process the selected option
+                // PROCESS THE SELECTED OPTION
                 if  (
                     (selectedProcessingChoice == (ProcessingOptions.FirstTokenProbability)) ||
                     (selectedProcessingChoice == (ProcessingOptions.FirstTokenProbabilityWithBrierScore))

@@ -64,9 +64,9 @@ namespace AzureOpenAILogProbs.Services
             var logProbChatCompletionOptions = new ChatCompletionOptions()
             {
                 Temperature = temperature,
-                IncludeLogProbabilities = true, 
+                IncludeLogProbabilities = true, // turn on log probabilities
                 EndUserId = "LogProbsTester",
-                TopLogProbabilityCount = includeTopProbabilities ? 5 : 1
+                TopLogProbabilityCount = includeTopProbabilities ? 5 : 1 // Azure OpenAI maximum is 5
             };
 
             return logProbChatCompletionOptions;
