@@ -9,7 +9,14 @@
 
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbsConsoleApp.png)
 
-## Get Started: Clone the repo. Add this to the User Secrets (Right Click on VS Project -> Manage User Secrets) and run the console application.  
+## Getting Started
+
+### Clone the repo
+```
+https://github.com/bartczernicki/AzureOpenAILogProbs.git
+```
+
+### Add this to the User Secrets (Right Click on VS Project -> Manage User Secrets) and run the console application.  
 ```javascript
 {
   "AzureOpenAI": {
