@@ -7,6 +7,7 @@
             const int NUMBEROFSIMULATIONS = 10000000; // 10,000,000 simulations, make this smaller for faster results
 
             // This is what the AI model claims the confidence is for the various questions
+            // This can be calculated from a representative sample of questions (e.g. 200 questions from a production system)
             const int CLAIMEDCONFIDENCEOFAIMODEL = 80; // 80% confidence
 
             Console.WriteLine($"Simulating {NUMBEROFSIMULATIONS:n0} iterations with a claimed AI LLM Model confidence of {CLAIMEDCONFIDENCEOFAIMODEL}% for 100 questions");
