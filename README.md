@@ -1,15 +1,26 @@
 ![Azure OpenAI LogProbs Title](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-Title.png)
 
 ## Azure OpenAI Log Probabilities (LogProbs) Examples  
-   * .NET Console application that shows examples how Azure OpenAI LogProbs that can be useful for RAG implementations:
-     * 1) Calculate First Token Probability - True or False probability, returns the top probability whether the (LLM) model has enough info to answer question  
-     * 2) Calculate First Token Probability [With Brier Scores] - True or False probability, returns the top probability whether the (LLM) model has enough info to answer question. Calculates Brier Scores to measure the probabilistic forecasting capability of the model.
-     * Weighted Probability of Confidence Score - returns a Self Confidence Score that is weighted from a probability (top 5 probabilities) distribution to give a better (weighted) confidence score estimate to answer a question.
-     * Confidence Interval - Calculated from bootstrap simulation of multiple calls to the model. This provides a 95% confidence interval (range) of plausible confidence scores. This is ideal when you need to understand a range of possibilities the model interprets rather than a single point estimate.
+.NET Console application that shows examples how Azure OpenAI LogProbs that can be useful for RAG implementations:  
+1) **Calculate First Token Probability** - True or False probability, returns the top probability whether the (LLM) model has enough info to answer question
+2) **Calculate First Token Probability [With Brier Scores]** - True or False probability, returns the top probability whether the (LLM) model has enough info to answer question. Calculates Brier Scores both individual and a total average to measure the probabilistic forecasting capability of the model.
+3) **Weighted Probability of Confidence Score** - Returns a self-confidence Score between 1-10 that is weighted from a probability (top 5 log probabilities) distribution to give an improved (weighted) confidence score estimate to answer a question.  
+4) **Confidence Interval** - Calculated from bootstrap simulation of multiple calls to the model. This provides a 95% confidence interval (range) of plausible confidence scores. This is ideal when you need to understand a plausible range of possibilities the model interprets rather than a single point estimate.  
 
 ![Azure Log Probs](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbsConsoleApp.png)
 
-## Get Started: Clone the repo. Add this to the User Secrets (Right Click on VS Project -> Manage User Secrets) and run the console application.  
+## Getting Started
+
+### Requirements
+* .NET 8.x SDK Installed
+* Azure OpenAI API Access (OpenAI Access will work as well) with either GPT3.5, GPT-4T, GPT-4o, GPT-4o-mini deployed
+
+### Clone the repo
+```
+git clone https://github.com/bartczernicki/AzureOpenAILogProbs.git
+```
+
+### Add this to the User Secrets (Right Click on VS Project -> Manage User Secrets) and run the console application.  
 ```javascript
 {
   "AzureOpenAI": {
@@ -18,39 +29,63 @@
     "Endpoint": "https://YOURAZUREOPENAIENDPOINT.openai.azure.com/"
   }
 }
-```  
+```
 
-The ability to inspect token log probabilities is turned off by default. To enable this feature, you need to set the IncludeLogProbabilities to true. This does not cost any extra tokens nor make the API calls cost more money. However, this very slightly increases the payload of the JSON object coming back. For example, using the new OpenAI .NET library it is exposed as a property.  
+### Build and Run (Can build or Debug from Visual Studio)
+```
+dotnet build
+dotnet run
+```
+
+### Key Info About Solution Setup
+
+In this setup, the LLM will be provided with selected paragraphs from a Wikipedia article on the New York Mets baseball team. The full article can be located here: https://en.wikipedia.org/wiki/New_York_Mets. This is the context (grounding information) that will always be provided in each prompt.  
+
+In addition, there are 20 question and answer pairs provided. Each item in the list has has a question about the Mets Wikipedia article paired with a human assessment True/False, if there is enough information in the provided Wikipedia article to answer the question. Each question will be sent to the LLM and then the LLM will assess if it has sufficient information to answer the question will be compared to the human assessment. Two examples from the list of 20 questions: 
+```csharp
+new Question{ Number = 1, EnoughInformationInProvidedContext = true, QuestionText = "When where the Mets founded?" },
+new Question{ Number = 2, EnoughInformationInProvidedContext = true, QuestionText = "Are the Mets a baseball team or basketball team?" },
+```
+
+The ability to inspect token log probabilities is turned off by default. To enable this feature, you need to set the IncludeLogProbabilities to true. This does not cost any extra tokens nor make the API calls cost more money. However, this very slightly increases the payload of the JSON object coming back. For example, using the new OpenAI .NET library it is exposed as a property on the ChatCompletionOptions class.  
 ```csharp
 chatCompletionOptions.IncludeLogProbabilities = true;
 ```
 
-You can also control how many token log probabilities are returned with each API call. This provides an array/List of tokens with each respective probability. In statistics, this is known as a Probability Mass Function (PMF) as it a discrete distribution of probabilities. Note: On Azure OpenAI, this has a current maximum of 5 and on OpenAI 10 (for most APIs). For example, using the new OpenAI .NET library it is exposed as a property.  
+Inlcuded is also the ability to control how many token log probabilities are returned with each API call. This provides an array/List of tokens with each respective probability. In statistics, this is known as a Probability Mass Function (PMF) as it a discrete distribution of probabilities. Note: On Azure OpenAI, this has a current maximum of 5 and on OpenAI 10 (for most APIs). For example, using the new OpenAI .NET library it is exposed as a property on the ChatCompletionOptions class.  
 ```csharp
 chatCompletionOptions.TopLogProbabilityCount = 5;
 ```
 
-## Background Information  
+That is basically the core setup of this solution. The rest of the code is C# code to wire up the input/output of the services and ensure that the calculations are properly performed and visualized in the console application.  
 
-What are LogProbs (Log Probabilities)? Most current LLMs process prompt instructions by predicting the next token and iterate through each token until they reach a stopping point (i.e. max token length, completing the user instructions). 
-Each next token that is considered for output is calculated through an internal LLM pipeline that outputs a statistical probability distribution. 
-Based on configurations (temperature, top_p etc.) these probabilities can be set and then the LLM selects the next "best token" based on the different configurations. 
-Because these LLMs are probabilistic in nature, this is why you may see different tokens output for the same prompt instruction sent to the LLM. 
-Below is an example of a question and answer and the associated probabilities for the two tokens (words) that were selected to answer the question: "Who was the first president of the United States?". 
-In the example below the model answered with two tokens "George" "Washington", using the token probabilities of 99.62% and 99.99%.  
+
+## Background Information on Log Probabilities  
+
+What are LogProbs (Log Probabilities)? Most current LLMs process prompt instructions by predicting the next token and iterate through each token until they reach a stopping point (i.e. max token length, completing the user instructions). Each next token that is considered for output is calculated through an internal LLM pipeline that outputs a statistical probability distribution. Based on configurations (temperature, top_p etc.) these probabilities can be set and then the LLM selects the next "best token" based on the different configurations. Because these LLMs are probabilistic in nature, this is why you may see different tokens output for the same prompt instruction sent to the LLM.  
+
+Below is an example of a question and answer and the associated probabilities for the two tokens (words) that were selected to answer the question: "Who was the first president of the United States?". In the example below the model answered with two tokens "George" "Washington", using the token probabilities of 99.62% and 99.99% respectively. There are settings that can calibrate how strict or creative an LLM is. For example, you may have heard of a setting called **Temperature** that basically increases the chance of lower probability tokens being selected.  
 
 ![Azure LogProbs Example](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-Example.png)
 
-Recommended Reading on the background of Azure OpenAI LogProbs:  
+Need more info? Recommended Reading on the background of Azure OpenAI LogProbs:  
    * OpenAI Cookbook - LogProbs: https://cookbook.openai.com/examples/using_logprobs  
    * What are LogProbs?: https://www.ignorance.ai/p/what-are-logprobs  
 
-There are several emerging techniques that use multiple calls to a model or several models to arrive at a response, conclusion or a quality decision. Currently, most ways LLMs are used in GenAI production systems is with grounding (RAG) by providing additional contextual information. The model is asked to answer a question, reason over that information etc. However, with poor grounding, this can result in poor results.  
+## Using LogProbs for Improving GenAI Quality
 
-Azure OpenAI LogProbs are a tool that can help and be used to gauge the confidence (probability) of the model's response.
+There are various proven and emering techniques that use multiple calls to a model or several models to arrive at a response, conclusion or a quality decision. Currently, most ways LLMs are used in GenAI production systems is with grounding (RAG) by providing additional contextual information. The model is instructed to answer a question, reason over that information etc. However, with poor grounding techniques, this can result in lower quality results.  
+
+Azure OpenAI LogProbs are an advanced technique that can help and be used to gauge the confidence (probability) of the model's response.
 This tremendous capability can empower the AI system to self-correct or guide the user/agent to arrive at a better response.
 In the set of examples below, we will simulate a parallel call to the model to gauge the confidence the model has with the presented context and question.
-This is illustrated below with the diagram:  
+
+This is illustrated below with the diagram of the GenAI workflow. Notice that there are two paths (left and right):  
+* The left path is the traditional path most GenAI applications follow. You ask a question and receive a response from an LLM. This typical workflow on the left is what one will find in most current GenAI Chat applications.
+* The right path is a **"quality enhacement"** to the workflow. In parallel, one can ask the LLM "LLM, do you have enough information to answer this question and how sure are you there enough information?"! Notice from the diagram below with this "quality enhancement" now includes:
+    1) **Answer** to the question  
+    2) **Does the Model Have Enough Information to Answer the Question** - True or False estime from the LLM
+    3) **Probability of Having Enough Information to Answer the Question** - Calculated from LogProbs; which can be used for additional statistical inference or decision threshholding  
 
 ![Azure LogProbs Workflow](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-LogProbsWorkflow.png)  
 
@@ -100,10 +135,10 @@ Example Output:
 
 To return multiple Log Probabilities set the LogProbabilitiesPerToken to 5 (current Azure OpenAI maximum, as of this writing):  
 ```chsarp
-chatCompletionOptionsConfidenceScore.Temperature = 0.0f;
-chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
-// For the Confidence Score, we want to investigate 5 of the top log probabilities (PMF)
-chatCompletionOptionsConfidenceScore.LogProbabilitiesPerToken = 5;
+chatCompletionOptions.Temperature = 0.3f; // Higher Temperature setting will use tokens with much lower probability  
+chatCompletionOptions.IncludeLogProbabilities = true;  
+// For the Confidence Score, we want to investigate 5 of the top log probabilities (PMF)  
+chatCompletionOptions.TopLogProbabilityCount = 5;  
 ```  
 
 Example Output:  
