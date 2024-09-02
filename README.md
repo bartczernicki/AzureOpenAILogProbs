@@ -47,15 +47,18 @@ new Question{ Number = 1, EnoughInformationInProvidedContext = true, QuestionTex
 new Question{ Number = 2, EnoughInformationInProvidedContext = true, QuestionText = "Are the Mets a baseball team or basketball team?" },
 ```
 
-The ability to inspect token log probabilities is turned off by default. To enable this feature, you need to set the IncludeLogProbabilities to true. This does not cost any extra tokens nor make the API calls cost more money. However, this very slightly increases the payload of the JSON object coming back. For example, using the new OpenAI .NET library it is exposed as a property.  
+The ability to inspect token log probabilities is turned off by default. To enable this feature, you need to set the IncludeLogProbabilities to true. This does not cost any extra tokens nor make the API calls cost more money. However, this very slightly increases the payload of the JSON object coming back. For example, using the new OpenAI .NET library it is exposed as a property on the ChatCompletionOptions class.  
 ```csharp
 chatCompletionOptions.IncludeLogProbabilities = true;
 ```
 
-Inlcuded is also the ability to control how many token log probabilities are returned with each API call. This provides an array/List of tokens with each respective probability. In statistics, this is known as a Probability Mass Function (PMF) as it a discrete distribution of probabilities. Note: On Azure OpenAI, this has a current maximum of 5 and on OpenAI 10 (for most APIs). For example, using the new OpenAI .NET library it is exposed as a property.  
+Inlcuded is also the ability to control how many token log probabilities are returned with each API call. This provides an array/List of tokens with each respective probability. In statistics, this is known as a Probability Mass Function (PMF) as it a discrete distribution of probabilities. Note: On Azure OpenAI, this has a current maximum of 5 and on OpenAI 10 (for most APIs). For example, using the new OpenAI .NET library it is exposed as a property on the ChatCompletionOptions class.  
 ```csharp
 chatCompletionOptions.TopLogProbabilityCount = 5;
 ```
+
+That is basically the core setup of this solution. The rest of the code is C# code to wire up the input/output of the services and ensure that the calculations are properly performed and visualized in the console application.  
+
 
 ## Background Information on Log Probabilities  
 
