@@ -83,8 +83,8 @@ In the set of examples below, we will simulate a parallel call to the model to g
 This is illustrated below with the diagram. Notice that there are two paths (left and right):  
 * The left path is the traditional path most GenAI applications follow. You ask a question and receive a response from an LLM. This is typical workflow on the left is what one will find in most Chat applications.
 * The right path is a **"quality enhacement"** to the workflow. In parallel, one can ask the LLM **"LLM, do you have enough information to answer this question and how sure are you there enough information?"**! Notice from the diagram below with this **"quality enhancement"** now includes:
-    1) The answer to the question  
-    2) Estimate if there is enough information to answer the question  
+    1) **Answer** to the question  
+    2) **Does the Model Have Enough Information to Answer the Question** - True or False estime from the LLM
     3) Probability of the estimate if there is enough information to answer the question, which can be used for additiona calculations or decision threshholding  
 
 ![Azure LogProbs Workflow](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-LogProbsWorkflow.png)  
