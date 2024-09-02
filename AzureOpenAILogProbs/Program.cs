@@ -42,14 +42,13 @@ namespace AzureOpenAILogProbs
                 ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
                 IConfiguration configuration = configurationBuilder.AddUserSecrets<Program>().Build();
 
-                // Retrieve the Azure OpenAI Configuration Section
+                // Retrieve the Azure OpenAI Configuration Section (secrets.json)
                 var azureOpenAISection = configuration.GetSection("AzureOpenAI");
-
                 var azureOpenAIAPIKey = configuration.GetSection("AzureOpenAI")["APIKey"];
                 var azureOpenAIEndpoint = configuration.GetSection("AzureOpenAI")["Endpoint"];
                 var azureModelDeploymentName = configuration.GetSection("AzureOpenAI")["ModelDeploymentName"];
 
-                // check if Secrets values are not NULL/missing
+                // Check if Secrets values are not NULL/missing
                 if (string.IsNullOrEmpty(azureOpenAIAPIKey) || string.IsNullOrEmpty(azureOpenAIEndpoint) || string.IsNullOrEmpty(azureModelDeploymentName))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -57,14 +56,7 @@ namespace AzureOpenAILogProbs
                     Console.ReadLine();
                 }
 
-                // Set the LLM Temperature
-                const float OPENAITEMPATURE = 0.3f; // Max value 2. Very direct and instructive prompts will negate temperature.
-                // When running Option #4...
-                // To simulate more variance in selecting lower probability tokens, increase the temperature to between 1.4 - 2.0.
-
-                // Create a random number generator to prevent KV-Cache re-use
-                var randomGenerator = new Random();
-
+                // OpenAI .NET Info: https://github.com/openai/openai-dotnet
                 // Define the OpenAI Client Options, increase max retries and delay for the exponential backoff
                 // Note: This is better handled by a Polly Retry Policy using 429 status codes for optimization
                 var retryPolicy = new ClientRetryPolicy(maxRetries: 10);
@@ -74,11 +66,10 @@ namespace AzureOpenAILogProbs
                 Uri azureOpenAIResourceUri = new(azureOpenAIEndpoint!);
                 AzureKeyCredential azureKeyCredential = new(azureOpenAIAPIKey!);
                 
-                // Info: https://github.com/openai/openai-dotnet
                 var client = new AzureOpenAIClient(azureOpenAIResourceUri, azureKeyCredential, azureOpenAIClientOptions);
                 var modelDeploymentName = azureModelDeploymentName;
              
-                // Define a sample Wikipedia Article to use as grounding information for the questions
+                // Define a default Wikipedia Article to use as grounding information for the questions
                 var sampleWikipediaArticle = Services.Questions.GetContextForQuestions();
 
                 // User input selection - Processing Options
@@ -134,7 +125,7 @@ namespace AzureOpenAILogProbs
 
                         var promptInstructionsTrueFalse = Services.GenAI.GetPromptInstructions(sampleWikipediaArticle, question, "TrueFalse");
 
-                        var chatCompletionsOptionsTrueFalse = GenAI.GetChatCompletionOptions(OPENAITEMPATURE, false);
+                        var chatCompletionsOptionsTrueFalse = GenAI.GetChatCompletionOptions(GenAI.OPENAITEMPATURE, false);
                         var chatMessages = GenAI.BuildChatMessageHistory(promptInstructionsTrueFalse);
 
                         // Get new chat client
@@ -208,7 +199,6 @@ namespace AzureOpenAILogProbs
                     // From this Wikipedia article from the OpenAI Cookbook
                     // https://cookbook.openai.com/examples/using_logprobs
 
-
                     foreach (var question in questions)
                     {
                         var promptInstructionsConfidenceScore = Services.GenAI.GetPromptInstructions(sampleWikipediaArticle, question, "ConfidenceScore");
@@ -218,7 +208,7 @@ namespace AzureOpenAILogProbs
                         // Get new chat client
                         var chatClient = client.GetChatClient(modelDeploymentName);
 
-                        var chatCompletionOptionsConfidenceScore = GenAI.GetChatCompletionOptions(OPENAITEMPATURE, true);
+                        var chatCompletionOptionsConfidenceScore = GenAI.GetChatCompletionOptions(GenAI.OPENAITEMPATURE, true);
 
                         var response = await chatClient.CompleteChatAsync(chatMessages, chatCompletionOptionsConfidenceScore);
                         var responseValueContent = response.Value.Content[0].Text;
@@ -300,7 +290,7 @@ namespace AzureOpenAILogProbs
                         var chatClient = client.GetChatClient(modelDeploymentName);
 
                         // Set the Temperature higher to create variance in the responses
-                        var chatCompletionOptionsConfidenceScore = GenAI.GetChatCompletionOptions(OPENAITEMPATURE, true);
+                        var chatCompletionOptionsConfidenceScore = GenAI.GetChatCompletionOptions(GenAI.OPENAITEMPATURE, true);
 
                         var response = await chatClient.CompleteChatAsync(chatMessages, chatCompletionOptionsConfidenceScore);
                         var responseValueContent = response.Value.Content[0].Text;
@@ -365,19 +355,16 @@ namespace AzureOpenAILogProbs
                         bootstrapConfidenceScores.Add(bootstrapSample.Average());
                     }
 
-                    // DEBUG write out weightedConfidenceScores to a comma-separated string
-                    //var bootstrapConfidenceScoresString = string.Join(",", weightedConfidenceScores);
-                    //Console.WriteLine(bootstrapConfidenceScoresString);
-
                     // Calculate Standard Deviation of weightedConfidenceScores
                     var bootstrapConfidenceScoresStandardDeviation = Math.Round(bootstrapConfidenceScores.StandardDeviation(), 3);
 
-
                     // Calculate the 95% Confidence Interval
                     var bootstrapConfidenceScoresSorted = bootstrapConfidenceScores.OrderBy(a => a).ToList();
+
                     // Calculate the min and the max
                     var minimumScore = Math.Round(bootstrapConfidenceScoresSorted.Min(), 3);
                     var maximumScore = Math.Round(bootstrapConfidenceScoresSorted.Max(), 3);
+
                     // Calculate the 2.5% and 97.5% percentiles
                     var lowerPercentile = Math.Round(bootstrapConfidenceScoresSorted[25], 3);
                     var upperPercentile = Math.Round(bootstrapConfidenceScoresSorted[975], 3);

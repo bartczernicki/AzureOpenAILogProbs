@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using AzureOpenAILogProbs.DTOs;
-using MathNet.Numerics.Random;
-using OpenAI;
+﻿using AzureOpenAILogProbs.DTOs;
 using OpenAI.Chat;
 
 namespace AzureOpenAILogProbs.Services
 {
     internal static class GenAI
     {
+        // Set the LLM Temperature
+        // Max value 2. Very direct and instructive prompts will negate temperature.
+        // When running Option #4...
+        // To simulate more variance in selecting lower probability tokens, increase the temperature to between 1.4 - 2.0.
+        public const float OPENAITEMPATURE = 0.3f; 
 
         public static string GetPromptInstructions(string sampleWikipediaArticle, Question question, string typeOfResponse)
         {
