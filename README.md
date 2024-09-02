@@ -135,10 +135,10 @@ Example Output:
 
 To return multiple Log Probabilities set the LogProbabilitiesPerToken to 5 (current Azure OpenAI maximum, as of this writing):  
 ```chsarp
-chatCompletionOptionsConfidenceScore.Temperature = 0.0f;
-chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
-// For the Confidence Score, we want to investigate 5 of the top log probabilities (PMF)
-chatCompletionOptionsConfidenceScore.LogProbabilitiesPerToken = 5;
+chatCompletionOptions.Temperature = 0.3f; // Higher Temperature setting will use tokens with much lower probability  
+chatCompletionOptions.IncludeLogProbabilities = true;  
+// For the Confidence Score, we want to investigate 5 of the top log probabilities (PMF)  
+chatCompletionOptions.TopLogProbabilityCount = 5;  
 ```  
 
 Example Output:  
