@@ -20,8 +20,7 @@
 }
 ```  
 
-The ability to inspect token log probabilities is turned off by default. To enable this feature, you need to set the IncludeLogProbabilities to true. 
-For example, using the new OpenAI .NET library it is exposed as a property.  
+The ability to inspect token log probabilities is turned off by default. To enable this feature, you need to set the IncludeLogProbabilities to true. This does not cost any extra tokens nor make the API calls cost more money. However, this very slightly increases the payload of the JSON object coming back. For example, using the new OpenAI .NET library it is exposed as a property.  
 ```csharp
 chatCompletionOptions.IncludeLogProbabilities = true;
 ```
