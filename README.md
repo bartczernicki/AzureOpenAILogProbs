@@ -57,13 +57,11 @@ Inlcuded is also the ability to control how many token log probabilities are ret
 chatCompletionOptions.TopLogProbabilityCount = 5;
 ```
 
-## Background Information  
+## Background Information on Log Probabilities  
 
-What are LogProbs (Log Probabilities)? Most current LLMs process prompt instructions by predicting the next token and iterate through each token until they reach a stopping point (i.e. max token length, completing the user instructions). 
-Each next token that is considered for output is calculated through an internal LLM pipeline that outputs a statistical probability distribution. 
-Based on configurations (temperature, top_p etc.) these probabilities can be set and then the LLM selects the next "best token" based on the different configurations. Because these LLMs are probabilistic in nature, this is why you may see different tokens output for the same prompt instruction sent to the LLM.  
+What are LogProbs (Log Probabilities)? Most current LLMs process prompt instructions by predicting the next token and iterate through each token until they reach a stopping point (i.e. max token length, completing the user instructions). Each next token that is considered for output is calculated through an internal LLM pipeline that outputs a statistical probability distribution. Based on configurations (temperature, top_p etc.) these probabilities can be set and then the LLM selects the next "best token" based on the different configurations. Because these LLMs are probabilistic in nature, this is why you may see different tokens output for the same prompt instruction sent to the LLM.  
 
-Below is an example of a question and answer and the associated probabilities for the two tokens (words) that were selected to answer the question: "Who was the first president of the United States?". In the example below the model answered with two tokens "George" "Washington", using the token probabilities of 99.62% and 99.99% respectively. 
+Below is an example of a question and answer and the associated probabilities for the two tokens (words) that were selected to answer the question: "Who was the first president of the United States?". In the example below the model answered with two tokens "George" "Washington", using the token probabilities of 99.62% and 99.99% respectively. There are settings that can calibrate how strict or creative an LLM is. For example, you may have heard of a setting called **Temperature** that basically increases the chance of lower probability tokens being selected.  
 
 ![Azure LogProbs Example](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-Example.png)
 
