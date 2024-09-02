@@ -31,9 +31,10 @@ git clone https://github.com/bartczernicki/AzureOpenAILogProbs.git
 }
 ```
 
-### Build and Run (Can build or Debug from Visual Studio)
+### Build and Run Commands (You can also build or Debug from Visual Studio 2022+)
 ```
 dotnet build
+
 dotnet run
 ```
 
