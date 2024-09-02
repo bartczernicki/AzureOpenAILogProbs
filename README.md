@@ -101,16 +101,17 @@ The power of LogProbs is illustrated below with the diagram of the GenAI workflo
 Example Output:
 ![Azure OpenAI Log Probs - First Token Prob](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/ProcessOption-FirstTokenProbability.png)  
 
-Note the image above illustrates the True and False output from the LLM as well as the probability of that True or False output.
-Because the True or False are the first and only tokens in the response, the first token (LogProb) probability can be used.
+Note the image above illustrates the True and False output from the LLM as well as the probability of that True or False output. Because "True" or "False" are the first and only tokens in the response, the first token (LogProb) probability can be used. There are a couple of issues with this approach:
+* Only the first token and probability are being investigated. Looking at the George Washington example above, note that there are various tokens that can be output that can be components or be similar to "George Washington". The same applies even when only looking at "True" or "False" tokens. There could be tokens like "TRU", "true", "tr" and they all should be grouped together to signify a collective probability of "True". The samples below illustrate this.
+* Running the examples many times there will sometimes seem to be a discrepancy between the first token versus the top LogProb. This is because the OpenAI service can select tokens with lower probabilities, expecially with settings like a higher temperature. This is a simple fix, basically LogProbs allow the developer to override the selected first token and select the one with the highest probability.  
 
 
 ### 2) First Token Probability [With Brier Scores] - Calculating Brier Scores of the First Token Probability
-   * This example shows how to measure the forecasting & predictive accuracy of the model.
-   * Same as the First Token Probability, but also calculates the Brier Score for each of the probability answers.
-   * Brier scores (and similar methods in Machine Learning & Statistics) are used to measure the accuracy of probabilistic predictions.
-   * The lower the Brier Score, the better the model is at predicting the probability of the answer response.
-   * It outputs a table of the Brier Scores for each of the questions and the average Brier Score for all the questions.
+   * This example shows how to measure the forecasting & predictive accuracy of the model.  
+   * Same as the First Token Probability, but also calculates the Brier Score for each of the probability answers.  
+   * Brier scores (and similar methods in Machine Learning & Statistics) are used to measure the accuracy performance of probabilistic predictions.  
+   * The lower the Brier Score, the better the model is at predicting the probability of the answer response. For example, if there are two models and they both predict the correct event, but the first model's probability was 65% and the second model's probability was 95%, the Brier score for the second model will be lower. This is because if the future event occurs, it is automatically given a probability of 100%. 95% is closer to 100%. More information on Brier scores: https://en.wikipedia.org/wiki/Brier_score  
+   * This example outputs a table of the Brier Scores for each of the questions and the average Brier Score for all the questions.  
    * Averaging Brier scores can tell us a great deal about the overall performance accuracy of the probabilistic system or a probabilistic model. Average Brier Scores of 0.1 or lower are considered excellent, 0.1 - 0.2 are superior, 0.2 - 0.3 are adequate, and 0.3-0.35 are acceptable, and finally average Brier scores above 0.35 indicate poor prediction performance.  
 
 Brier scores will vary depending on the model capabilities, the prompt, and the context of the question. 
