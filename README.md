@@ -20,10 +20,15 @@
 }
 ```  
 
-The ability to inspect token log probabilities is turned off by default. To enable this feature, you need to set the EnableLogProbabilities to true. 
-For example the .NET Azure OpenAI exposes this as a property.  
+The ability to inspect token log probabilities is turned off by default. To enable this feature, you need to set the IncludeLogProbabilities to true. 
+For example, using the new OpenAI .NET library it is exposed as a property.  
 ```csharp
-chatCompletionOptionsConfidenceScore.EnableLogProbabilities = true;
+chatCompletionOptions.IncludeLogProbabilities = true;
+```
+
+You can also control how many token log probabilities are returned with each API call. This provides an array/List of tokens with each respective probability. In statistics, this is known as a Probability Mass Function (PMF) as it a discrete distribution of probabilities. Note: On Azure OpenAI, this has a current maximum of 5 and on OpenAI 10 (for most APIs). For example, using the new OpenAI .NET library it is exposed as a property.  
+```csharp
+chatCompletionOptions.TopLogProbabilityCount = 5;
 ```
 
 ## Background Information  
