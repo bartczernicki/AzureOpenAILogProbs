@@ -13,7 +13,7 @@
 
 ### Clone the repo
 ```
-https://github.com/bartczernicki/AzureOpenAILogProbs.git
+git clone https://github.com/bartczernicki/AzureOpenAILogProbs.git
 ```
 
 ### Add this to the User Secrets (Right Click on VS Project -> Manage User Secrets) and run the console application.  
