@@ -37,7 +37,9 @@ dotnet build
 dotnet run
 ```
 
-### Key Info About Solution  
+### Key Info About Solution Setup
+
+In this setup, the LLM will be provided with selected paragraphs from a Wikipedia article on the New York Mets. The full article can be located here: https://en.wikipedia.org/wiki/New_York_Mets.  
 
 There are 20 question and answer pairs provided. Each item in the list has has a question about the Wikipedia article paired with a human assessment True/False, if there is enough information in the provided Wikipedia article to answer the question. Each question will be sent to the LLM and then the LLMs assessment if it has sufficient information to answer the question will be compared to the human assessment. Two examples from the list of 20 questions: 
 ```csharp
@@ -59,14 +61,13 @@ chatCompletionOptions.TopLogProbabilityCount = 5;
 
 What are LogProbs (Log Probabilities)? Most current LLMs process prompt instructions by predicting the next token and iterate through each token until they reach a stopping point (i.e. max token length, completing the user instructions). 
 Each next token that is considered for output is calculated through an internal LLM pipeline that outputs a statistical probability distribution. 
-Based on configurations (temperature, top_p etc.) these probabilities can be set and then the LLM selects the next "best token" based on the different configurations. 
-Because these LLMs are probabilistic in nature, this is why you may see different tokens output for the same prompt instruction sent to the LLM. 
-Below is an example of a question and answer and the associated probabilities for the two tokens (words) that were selected to answer the question: "Who was the first president of the United States?". 
-In the example below the model answered with two tokens "George" "Washington", using the token probabilities of 99.62% and 99.99%.  
+Based on configurations (temperature, top_p etc.) these probabilities can be set and then the LLM selects the next "best token" based on the different configurations. Because these LLMs are probabilistic in nature, this is why you may see different tokens output for the same prompt instruction sent to the LLM.  
+
+Below is an example of a question and answer and the associated probabilities for the two tokens (words) that were selected to answer the question: "Who was the first president of the United States?". In the example below the model answered with two tokens "George" "Washington", using the token probabilities of 99.62% and 99.99% respectively. 
 
 ![Azure LogProbs Example](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-Example.png)
 
-Recommended Reading on the background of Azure OpenAI LogProbs:  
+Need more info? Recommended Reading on the background of Azure OpenAI LogProbs:  
    * OpenAI Cookbook - LogProbs: https://cookbook.openai.com/examples/using_logprobs  
    * What are LogProbs?: https://www.ignorance.ai/p/what-are-logprobs  
 
