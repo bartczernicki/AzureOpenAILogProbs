@@ -11,6 +11,10 @@
 
 ## Getting Started
 
+### Requirements
+* .NET 8.x SDK Installed
+* Azure OpenAI API Access (OpenAI Access will work as well) with any of GPT3.5, GPT-4T, GPT-4o installed
+
 ### Clone the repo
 ```
 git clone https://github.com/bartczernicki/AzureOpenAILogProbs.git
