@@ -21,7 +21,7 @@
 git clone https://github.com/bartczernicki/AzureOpenAILogProbs.git
 ```
 
-### Add this to the User Secrets (Right Click on VS Project -> Manage User Secrets) and run the console application.  
+### Add this to the Secrets.json (Right Click on VS Project -> Manage User Secrets) and run the console application.  
 ```javascript
 {
   "AzureOpenAI": {
