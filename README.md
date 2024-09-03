@@ -21,7 +21,7 @@
 git clone https://github.com/bartczernicki/AzureOpenAILogProbs.git
 ```
 
-### Add this to the Secrets.json (Right Click on VS Project -> Manage User Secrets) and run the console application.  
+### Add this to the Secrets.json (Right Click on VS Project -> Manage User Secrets) and run the console application
 ```javascript
 {
   "AzureOpenAI": {
@@ -41,7 +41,7 @@ dotnet run
 
 ### Key Info About Solution Setup
 
-In this setup, the LLM will be provided with selected paragraphs from a Wikipedia article on the New York Mets baseball team. The full article can be located here: https://en.wikipedia.org/wiki/New_York_Mets. This is the context (grounding information) that will always be provided in each prompt.  
+In this setup, the LLM will be provided with selected paragraphs from a Wikipedia article on the history of New York Mets baseball team. The full article can be located here: https://en.wikipedia.org/wiki/New_York_Mets. This is the context (grounding information) that will always be provided in each prompt.  
 
 In addition, there are 20 question and answer pairs provided. Each item in the list has has a question about the Mets Wikipedia article paired with a human assessment True/False, if there is enough information in the provided Wikipedia article to answer the question. Each question will be sent to the LLM and then the LLM will assess if it has sufficient information to answer the question. That answer will be compared to the human assessment (logical truth). Two examples from the list of 20 questions: 
 ```csharp
