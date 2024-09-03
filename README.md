@@ -1,8 +1,8 @@
 ![Azure OpenAI LogProbs Title](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-Title.png)
 
 ## Azure OpenAI Log Probabilities (LogProbs) Examples  
-.NET Console application that shows examples how Azure OpenAI LogProbs that can be useful for RAG implementations:  
-1) **Calculate First Token Probability** - True or False probability, returns the top probability whether the (LLM) model has enough info to answer question
+.NET Console application that demonstrates four examples how Azure OpenAI LogProbs that can be useful for quality information retrieval:  
+1) **Calculate First Token Probability** - True or False probability, returns the top probability whether the (LLM) model has enough info to answer question.  
 2) **Calculate First Token Probability [With Brier Scores]** - True or False probability, returns the top probability whether the (LLM) model has enough info to answer question. Calculates Brier Scores both individual and a total average to measure the probabilistic forecasting capability of the model.
 3) **Weighted Probability of Confidence Score** - Returns a self-confidence Score between 1-10 that is weighted from a probability (top 5 log probabilities) distribution to give an improved (weighted) confidence score estimate to answer a question.  
 4) **Confidence Interval** - Calculated from bootstrap simulation of multiple calls to the model. This provides a 95% confidence interval (range) of plausible confidence scores. This is ideal when you need to understand a plausible range of possibilities the model interprets rather than a single point estimate.  
@@ -13,7 +13,7 @@
 
 ### Requirements
 * .NET 8.x SDK Installed
-* Azure OpenAI API Access (OpenAI Access will work as well) with either GPT3.5, GPT-4T, GPT-4o, GPT-4o-mini deployed
+* Azure OpenAI API Access: (OpenAI Access will work as well) either GPT3.5, GPT-4T, GPT-4o, GPT-4o-mini deployed and API key
 
 ### Clone the repo
 ```
