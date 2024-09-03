@@ -14,6 +14,7 @@
 ### Requirements
 * .NET 8.x SDK Installed
 * Azure OpenAI API Access: (OpenAI Access will work as well) either GPT3.5, GPT-4T, GPT-4o, GPT-4o-mini deployed and API key
+* Visual Studio 2022(+) if debugging the solution with an IDE 
 
 ### Clone the repo
 ```
