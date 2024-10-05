@@ -1,5 +1,6 @@
 ﻿using Azure;
 using Azure.AI.OpenAI;
+using Azure.Core;
 using AzureOpenAILogProbs.DTOs;
 using AzureOpenAILogProbs.Services;
 using ConsoleTables;
@@ -64,9 +65,9 @@ namespace AzureOpenAILogProbs
                 azureOpenAIClientOptions.RetryPolicy = retryPolicy;
 
                 Uri azureOpenAIResourceUri = new(azureOpenAIEndpoint!);
-                AzureKeyCredential azureKeyCredential = new(azureOpenAIAPIKey!);
-                
-                var client = new AzureOpenAIClient(azureOpenAIResourceUri, azureKeyCredential, azureOpenAIClientOptions);
+                var azureApiCredential = new System.ClientModel.ApiKeyCredential(azureOpenAIAPIKey!);
+
+                var client = new AzureOpenAIClient(azureOpenAIResourceUri, azureApiCredential, azureOpenAIClientOptions);
                 var modelDeploymentName = azureModelDeploymentName;
              
                 // Define a default Wikipedia Article to use as grounding information for the questions
@@ -130,7 +131,7 @@ namespace AzureOpenAILogProbs
                         var chatClient = client.GetChatClient(modelDeploymentName);
 
                         var response = await chatClient.CompleteChatAsync(chatMessages, chatCompletionsOptionsTrueFalse);
-                        var llmResponse = response.Value.Content.FirstOrDefault()!.ToString();
+                        var llmResponse = response.Value.Content.FirstOrDefault()!.Text;
 
                         // 1) Write the Question to the console
                         Console.ForegroundColor = ConsoleColor.Yellow;
