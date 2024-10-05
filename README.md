@@ -1,9 +1,9 @@
 ![Azure OpenAI LogProbs Title](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-Title.png)
 
 ## Azure OpenAI Log Probabilities (LogProbs) Examples  
-.NET Console application that shows examples how Azure OpenAI LogProbs that can be useful for RAG implementations:  
-1) **Calculate First Token Probability** - True or False probability, returns the top probability whether the (LLM) model has enough info to answer question
-2) **Calculate First Token Probability [With Brier Scores]** - True or False probability, returns the top probability whether the (LLM) model has enough info to answer question. Calculates Brier Scores both individual and a total average to measure the probabilistic forecasting capability of the model.
+.NET Console application that demonstrates four examples how Azure OpenAI LogProbs that can be useful for quality information retrieval:  
+1) **First Token Probability** - Calculates True or False probability, returns the top probability whether the (LLM) model has enough information to answer the question in the prompt.
+2) **First Token Probability [With Brier Scores]** - True or False probability, returns the top probability whether the (LLM) model has enough information to answer question in the prompt. Calculates Brier Scores both individual and a total average to measure the probabilistic forecasting accuracy of the (LLM) model.  
 3) **Weighted Probability of Confidence Score** - Returns a self-confidence Score between 1-10 that is weighted from a probability (top 5 log probabilities) distribution to give an improved (weighted) confidence score estimate to answer a question.  
 4) **Confidence Interval** - Calculated from bootstrap simulation of multiple calls to the model. This provides a 95% confidence interval (range) of plausible confidence scores. This is ideal when you need to understand a plausible range of possibilities the model interprets rather than a single point estimate.  
 
@@ -13,14 +13,15 @@
 
 ### Requirements
 * .NET 8.x SDK Installed
-* Azure OpenAI API Access (OpenAI Access will work as well) with either GPT3.5, GPT-4T, GPT-4o, GPT-4o-mini deployed
+* Azure OpenAI API Access: (OpenAI Access will work as well) either GPT3.5, GPT-4T, GPT-4o, GPT-4o-mini deployed and API key
+* Visual Studio 2022(+) if debugging the solution with an IDE 
 
 ### Clone the repo
 ```
 git clone https://github.com/bartczernicki/AzureOpenAILogProbs.git
 ```
 
-### Add this to the User Secrets (Right Click on VS Project -> Manage User Secrets) and run the console application.  
+### Add this to the Secrets.json (Right Click on VS Project -> Manage User Secrets) and run the console application
 ```javascript
 {
   "AzureOpenAI": {
@@ -40,7 +41,7 @@ dotnet run
 
 ### Key Info About Solution Setup
 
-In this setup, the LLM will be provided with selected paragraphs from a Wikipedia article on the New York Mets baseball team. The full article can be located here: https://en.wikipedia.org/wiki/New_York_Mets. This is the context (grounding information) that will always be provided in each prompt.  
+In this setup, the LLM will be provided with selected paragraphs from a Wikipedia article on the history of New York Mets baseball team. The full article can be located here: https://en.wikipedia.org/wiki/New_York_Mets. This is the context (grounding information) that will always be provided in each prompt.  
 
 In addition, there are 20 question and answer pairs provided. Each item in the list has has a question about the Mets Wikipedia article paired with a human assessment True/False, if there is enough information in the provided Wikipedia article to answer the question. Each question will be sent to the LLM and then the LLM will assess if it has sufficient information to answer the question. That answer will be compared to the human assessment (logical truth). Two examples from the list of 20 questions: 
 ```csharp
