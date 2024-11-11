@@ -16,7 +16,7 @@ namespace AzureOpenAILogProbs
         {
             {
                 Console.Title = "GenAI - Azure OpenAI LogProbs Examples";
-
+                
                 var asciiBanner = """
                        #                                   #######                         #    ### 
                       # #   ###### #    # #####  ######    #     # #####  ###### #    #   # #    #  
