@@ -61,7 +61,7 @@ namespace AzureOpenAILogProbs
                 // Define the OpenAI Client Options, increase max retries and delay for the exponential backoff
                 // Note: This is better handled by a Polly Retry Policy using 429 status codes for optimization
                 var retryPolicy = new ClientRetryPolicy(maxRetries: 10);
-                AzureOpenAIClientOptions azureOpenAIClientOptions = new AzureOpenAIClientOptions();
+                AzureOpenAIClientOptions azureOpenAIClientOptions = new AzureOpenAIClientOptions(AzureOpenAIClientOptions.ServiceVersion.V2025_01_01_Preview);
                 azureOpenAIClientOptions.RetryPolicy = retryPolicy;
 
                 Uri azureOpenAIResourceUri = new(azureOpenAIEndpoint!);
