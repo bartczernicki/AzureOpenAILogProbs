@@ -27,22 +27,28 @@ namespace AzureOpenAILogProbs.Services
                 {question.QuestionText}
                 -- END OF QUESTION--
                 INSTRUCTIONS: 
-                Before even answering the question, consider whether you have sufficient information in the Wikipedia article to answer the question fully.
-                Do not hallucinate. Do not make up factual information.
+                Before even answering the question, think carefully and consider whether you have sufficient information in the Wikipedia article to answer the question fully.
+                Do not hallucinate. Do not make up factual information. Do not use information from your training data.
                 """;
 
             var promptOutput = string.Empty;
             if (typeOfResponse == "TrueFalse")
             {
                 promptOutput = """
-                    Your output should JUST be the Boolean true or false, if you have sufficient information in the Wikipedia article to answer the question; you are not answering the actual question.
-                    Respond with just one word, the Boolean true or false. You must output the word 'True', or the word 'False', nothing else.
+                    Important: You are not answering the actual question. 
+                    Your output should JUST be the Boolean True or False, if you have sufficient information in the Wikipedia article to answer the question. 
+                    True means you have sufficient information to answer the question. 
+                    False means you do not have sufficient information to answer the question. 
+                    Respond with just one word, the Boolean True or False. You must output the word 'True', or the word 'False', nothing else.
                     """;
             }
             else if (typeOfResponse == "ConfidenceScore")
             {
                 promptOutput = $"""
-                    Your output should JUST be the a single confidence score between 1 to 10, if you have sufficient information in the Wikipedia article to answer the question; you are not answering the actual question.
+                    Important: You are not answering the actual question. 
+                    Your output should JUST be the a single confidence score between 1 to 10, if you have sufficient information in the Wikipedia article to answer the question.
+                    1 means you have no confidence in your answer. 
+                    10 means you have full confidence in your answer. 
                     Respond with just one confidence score number between 1 to 10. You must output a single number, nothing else.
                     """;
             }

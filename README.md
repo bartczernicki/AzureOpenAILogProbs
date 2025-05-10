@@ -12,8 +12,8 @@
 ## Getting Started
 
 ### Requirements
-* .NET 8.x SDK Installed
-* Azure OpenAI API Access: (OpenAI Access will work as well) either GPT3.5, GPT-4T, GPT-4o, GPT-4o-mini deployed and API key
+* .NET 9.x SDK Installed
+* Azure OpenAI API Access: (OpenAI Access will work as well) either: GPT3.5, GPT-4T, GPT-4o, GPT-4o-mini, GPT-4.1-nano, GPT-4.1-mini, GPT-4.1 deployed and API key
 * Visual Studio 2022(+) if debugging the solution with an IDE 
 
 ### Clone the repo
@@ -25,7 +25,7 @@ git clone https://github.com/bartczernicki/AzureOpenAILogProbs.git
 ```javascript
 {
   "AzureOpenAI": {
-    "ModelDeploymentName": "gpt-4-2024-04-09", // Any Azure OpenAI GPT-4o-mini, GPT-4o or GPT3.5 model should perform well
+    "ModelDeploymentName": "gpt-4.1", // Any Azure OpenAI GPT4-4.1, GPT-4o-mini, GPT-4o or GPT3.5 model should perform well
     "APIKey": "YOURAZUREOPENAIKEY",
     "Endpoint": "https://YOURAZUREOPENAIENDPOINT.openai.azure.com/"
   }
@@ -129,13 +129,16 @@ Note the image above illustrates the True and False output from the LLM as well 
 
 Brier scores will vary depending on the model capabilities, the prompt, and the context of the question. 
 By keeping the prompt and context the same, one can compare overall model accuracy performance. 
-Note the Brier scores below comparing GPT-4o and GPT-4o-mini models. The GPT-4o-mini model has a lower Brier score, which means it is more accurate in predicting the probability of the correct answer response. 
-In fact, the GPT-4o-mini correctly arrived at the final answer correctly 18 of the 20 questions, whereas the GPT-4o model matched the expected human answer (if there is enough info in the context to answer the question) 17 of 20 questions. Note the average Brier score of GPT-4o-mini is 0.083 (below 0.1), which indicates excellent predictive performance. 
-Therefore, the Brier score of the GPT-4o-mini model is lower (better). This empirically shows it is more accurate in quantifying the probability it has enough information to answer the provided prompt question.  
+Note the Brier scores below comparing GPT-4.1, GPT-4.1-mini and GPT-4.1-nano models. The GPT-4.1 and GPT-4.1-mini models have about equal Brier scores.  
+GPT-4.1-nano has a much Brier score, which means it is NOT as accurate in predicting the probability of the correct answer response.  
+In fact, the GPT-4.1-nano correctly arrived at the final answer correctly 17 of the 20 questions, whereas the larger GPT-4.1 models matched the expected human answer (if there is enough info in the context to answer the question) on 19 of 20 questions. 
+The Brier score of the GPT-4.1-mini and GPT-4.1 models is lower (better). This empirically shows that these two models are more accurate in quantifying the probability it has enough information to answer the provided prompt question.  
 Example Output:
-![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-4o](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT-4o.png)  
+![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-4.1](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT-41.png)  
 
-![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-4o-mini](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT-4o-mini.png)  
+![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-4.1-mini](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT-41-mini.png)  
+
+![Azure OpenAI Log Probs - Calculated Brier Scores - GPT-4.1-nano](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/AzureOpenAILogProbs/Images/AzureLogProbs-CalculatedBrierScores-GPT-41-nano.png)  
 
 
 ### 3) Weighted Probability of Confidence Score - Model provides a self-confidence score and then assess the probability of the confidence score
@@ -188,7 +191,7 @@ Basically, when the LLM says it is 8/10 confident or determine a probability of 
 Statistical Simulation Showing 10,000,000 simulations and the expected ranges for 100 questions 80% calibration:    
 ![Simulation of 80% answers](https://raw.githubusercontent.com/bartczernicki/AzureOpenAILogProbs/master/ExampleConfidenceIntervalSimulation/Images/ExampleConfidenceIntervalSimulation-Console.png)  
 
-These calibration techniques apply to real-world scenarios. Consider Mainifold Markets (https://manifold.markets/), where human super forecasters wager on the probability of events. 
+These calibration techniques apply to real-world scenarios. Consider Manifold Markets (https://manifold.markets/), where human super forecasters wager on the probability of events. 
 The collective wisdom of these human super forecasters is highly calibrated in predicting real-world events!  
 
 Example Calibration in a real forecasting environment from Manifold Markets of thousands of forecasts:
